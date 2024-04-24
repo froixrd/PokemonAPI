@@ -1,0 +1,23 @@
+﻿@model List<WebApplication3.Models.Pokemon>
+
+@{
+    ViewBag.Title = "Lista de Pokémon";
+}
+
+<h2>Lista de Pokémon</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pokemon in Model)
+        {
+            <tr>
+                <td>@pokemon.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
