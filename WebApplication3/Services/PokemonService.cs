@@ -204,7 +204,7 @@ namespace WebApplication3.Services
                     .Select(s => new StatItem { Name = Lookup(StatNames, s.Stat.Name), Value = s.BaseStat })
                     .ToList(),
                 Abilities = abilitiesTask.Result,
-                Matchups = BuildMatchups(typeKeys, types),
+                TypeChart = BuildTypeChart(typeKeys, types),
                 EvolutionStages = evolutionTask.Result,
 
                 Previous = neighbors == null ? null : neighbors.Item1,
@@ -359,11 +359,10 @@ namespace WebApplication3.Services
             return new TypeInfo { Key = key, Name = name ?? PrettyName(key) };
         }
 
-        /// <summary>Multiplicador de daño que recibe la combinación de tipos frente a cada tipo atacante.</summary>
-        private static IReadOnlyList<TypeMatchupGroup> BuildMatchups(IList<string> defending, IReadOnlyDictionary<string, TypeResponse> types)
+        /// <summary>Multiplicador de daño que recibe la combinación de tipos frente a cada uno de los 18 tipos atacantes.</summary>
+        private static IReadOnlyList<TypeEffectiveness> BuildTypeChart(IList<string> defending, IReadOnlyDictionary<string, TypeResponse> types)
         {
-            var multipliers = new Dictionary<string, double>();
-            foreach (var attacker in TypeKeys)
+            return TypeKeys.Select(attacker =>
             {
                 var m = 1.0;
                 foreach (var key in defending)
@@ -375,30 +374,8 @@ namespace WebApplication3.Services
                     else if (Contains(r.DoubleDamageFrom, attacker)) m *= 2;
                     else if (Contains(r.HalfDamageFrom, attacker)) m *= 0.5;
                 }
-                multipliers[attacker] = m;
-            }
-
-            var groups = new[]
-            {
-                new { Value = 4.0,  Label = "×4", Description = "Muy débil",      Css = "x4" },
-                new { Value = 2.0,  Label = "×2", Description = "Débil",          Css = "x2" },
-                new { Value = 0.5,  Label = "×½", Description = "Resistente",     Css = "x05" },
-                new { Value = 0.25, Label = "×¼", Description = "Muy resistente", Css = "x025" },
-                new { Value = 0.0,  Label = "×0", Description = "Inmune",         Css = "x0" }
-            };
-
-            return groups
-                .Select(g => new TypeMatchupGroup
-                {
-                    Label = g.Label,
-                    Description = g.Description,
-                    Css = g.Css,
-                    Types = TypeKeys.Where(k => Math.Abs(multipliers[k] - g.Value) < 0.001)
-                                    .Select(k => ToTypeInfo(k, types))
-                                    .ToList()
-                })
-                .Where(g => g.Types.Count > 0)
-                .ToList();
+                return new TypeEffectiveness { Type = ToTypeInfo(attacker, types), Multiplier = m };
+            }).ToList();
         }
 
         private static bool Contains(List<NamedApiResource> list, string name)

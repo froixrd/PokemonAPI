@@ -86,12 +86,35 @@ namespace WebApplication3.Models
         public bool IsHidden { get; set; }
     }
 
-    public class TypeMatchupGroup
+    /// <summary>Daño que recibe el Pokémon de un tipo atacante.</summary>
+    public class TypeEffectiveness
     {
-        public string Label { get; set; }       // "×2"
-        public string Description { get; set; } // "Débil"
-        public string Css { get; set; }
-        public IReadOnlyList<TypeInfo> Types { get; set; }
+        public TypeInfo Type { get; set; }
+        public double Multiplier { get; set; }
+
+        public string Label
+        {
+            get
+            {
+                if (Multiplier == 0) return "×0";
+                if (Multiplier == 0.25) return "×¼";
+                if (Multiplier == 0.5) return "×½";
+                return "×" + Multiplier.ToString("0", System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
+        public string Css
+        {
+            get
+            {
+                if (Multiplier == 0) return "x0";
+                if (Multiplier == 0.25) return "x025";
+                if (Multiplier == 0.5) return "x05";
+                if (Multiplier == 4) return "x4";
+                if (Multiplier == 2) return "x2";
+                return "x1";
+            }
+        }
     }
 
     public class EvolutionMember
@@ -139,7 +162,7 @@ namespace WebApplication3.Models
 
         public IReadOnlyList<StatItem> Stats { get; set; }
         public IReadOnlyList<AbilityItem> Abilities { get; set; }
-        public IReadOnlyList<TypeMatchupGroup> Matchups { get; set; }
+        public IReadOnlyList<TypeEffectiveness> TypeChart { get; set; }
         public IReadOnlyList<IReadOnlyList<EvolutionMember>> EvolutionStages { get; set; }
 
         public PokedexNeighbor Previous { get; set; }

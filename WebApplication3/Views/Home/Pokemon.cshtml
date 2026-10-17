@@ -131,20 +131,21 @@
 
         <section class="panel" aria-labelledby="h-matchups">
             <h2 id="h-matchups">Daño recibido</h2>
-            <dl class="matchups">
-                @foreach (var g in Model.Matchups)
+            <ul class="typechart">
+                @foreach (var e in Model.TypeChart)
                 {
-                    <div class="matchups__row matchups__row--@g.Css">
-                        <dt><strong>@g.Label</strong> @g.Description</dt>
-                        <dd>
-                            @foreach (var t in g.Types)
-                            {
-                                <span class="type type--@t.Key">@t.Name</span>
-                            }
-                        </dd>
-                    </div>
+                    <li class="typechart__cell typechart__cell--@e.Css type--@e.Type.Key" title="@e.Type.Name: @e.Label">
+                        <span class="typechart__icon" aria-hidden="true"></span>
+                        <span class="typechart__name">@e.Type.Name</span>
+                        <span class="typechart__mult">@e.Label</span>
+                    </li>
                 }
-            </dl>
+            </ul>
+            <p class="typechart-legend">
+                <span><strong>×4 ×2</strong>débil</span>
+                <span><strong>×½ ×¼</strong>resistente</span>
+                <span><strong>×0</strong>inmune</span>
+            </p>
         </section>
 
         <section class="panel panel--wide" aria-labelledby="h-abilities">

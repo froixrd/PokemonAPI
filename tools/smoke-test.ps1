@@ -62,8 +62,11 @@ Check ($d.EvolutionStages.Count -eq 3) "Etapas evolutivas: $($d.EvolutionStages.
 Check ($d.EvolutionStages[1][0].Condition -eq "Nivel 16") "Condición Charmeleon: $($d.EvolutionStages[1][0].Condition)"
 Check (-not [string]::IsNullOrEmpty($d.ArtworkUrl) -and -not [string]::IsNullOrEmpty($d.ArtworkShinyUrl)) "Ilustraciones normal y variocolor"
 Check (-not [string]::IsNullOrEmpty($d.CryUrl)) "Grito: $($d.CryUrl)"
-$x4 = $d.Matchups | Where-Object { $_.Css -eq "x4" }
-Check ($x4 -ne $null -and ($x4.Types | ForEach-Object { $_.Key }) -contains "rock") "Debilidad x4 a Roca"
+Check ($d.TypeChart.Count -eq 18) "Tabla de daño con $($d.TypeChart.Count) tipos"
+$rock = $d.TypeChart | Where-Object { $_.Type.Key -eq "rock" }
+$ground = $d.TypeChart | Where-Object { $_.Type.Key -eq "ground" }
+Check ($rock.Multiplier -eq 4 -and $rock.Label -eq "×4") "Roca contra Charizard: $($rock.Label)"
+Check ($ground.Multiplier -eq 0 -and $ground.Css -eq "x0") "Tierra contra Charizard: $($ground.Label)"
 Check ($d.Previous.Id -eq 5 -and $d.Next.Id -eq 7) "Anterior/siguiente: $($d.Previous.Name) / $($d.Next.Name)"
 
 $eevee = Await $svc.GetDetailAsync(133)
