@@ -223,18 +223,27 @@ function render(p) {
     </table>
 </section>`;
 
+    const weak = p.chart.filter((e) => e.multiplier > 1).sort((x, y) => y.multiplier - x.multiplier);
+    const resist = p.chart.filter((e) => e.multiplier > 0 && e.multiplier < 1).sort((x, y) => x.multiplier - y.multiplier);
+    const immune = p.chart.filter((e) => e.multiplier === 0);
+    const neutral = p.chart.filter((e) => e.multiplier === 1);
+    const dmgItems = (list) => list.length
+        ? `<ul class="dmg__list">${list.map((e) => `<li class="dmg__item type--${esc(e.type.key)}">${esc(e.type.name)}<span class="dmg__mult dmg__mult--${e.css}">${e.label}</span></li>`).join("")}</ul>`
+        : `<p class="dmg__none">Ninguno</p>`;
+
     const chart = `
 <section class="panel" aria-labelledby="h-matchups">
     <h2 id="h-matchups">Daño recibido</h2>
-    <ul class="typechart">${p.chart.map((e) => `<li class="typechart__cell typechart__cell--${e.css} type--${esc(e.type.key)}" title="${esc(e.type.name)}: ${e.label}">
-        <span class="typechart__icon" aria-hidden="true"></span>
-        <span class="typechart__name">${esc(e.type.name)}</span>
-        <span class="typechart__mult">${e.label}</span></li>`).join("")}</ul>
-    <p class="typechart-legend">
-        <span><strong>×4 ×2</strong>débil</span>
-        <span><strong>×½ ×¼</strong>resistente</span>
-        <span><strong>×0</strong>inmune</span>
-    </p>
+    <p class="panel__lead">Cuánto daño le hace cada tipo de ataque.</p>
+    <div class="dmg">
+        <div class="dmg__group dmg__group--weak"><h3>Débil a</h3>${dmgItems(weak)}</div>
+        <div class="dmg__group dmg__group--resist"><h3>Resiste</h3>${dmgItems(resist)}</div>
+        ${immune.length ? `<div class="dmg__group dmg__group--immune"><h3>Inmune a</h3>${dmgItems(immune)}</div>` : ""}
+        <div class="dmg__neutral">
+            <span>Daño normal (×1) de ${neutral.length} tipos</span>
+            <span class="dmg__neutral-icons">${neutral.map((e) => `<span class="type--${esc(e.type.key)}" title="${esc(e.type.name)}" aria-hidden="true"></span>`).join("")}</span>
+        </div>
+    </div>
 </section>`;
 
     const abilities = `

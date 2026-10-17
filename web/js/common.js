@@ -156,7 +156,7 @@ document.addEventListener("error", (event) => {
     const fallback = img.getAttribute("data-fallback");
     if (fallback && !img.hasAttribute("data-fell-back")) {
         img.setAttribute("data-fell-back", "");
-        img.classList.add("is-artwork");
+        img.classList.add("is-fallback");
         img.src = fallback;
     }
 }, true);

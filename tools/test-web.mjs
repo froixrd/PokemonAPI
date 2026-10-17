@@ -78,7 +78,8 @@ try {
     await page.waitForSelector(".dex-card:not([hidden])", { timeout: 30000 });
     const cards = await page.locator(".dex-card").count();
     check(cards >= 1025, `Pokédex con ${cards} tarjetas`);
-    check(await page.locator(".chip").count() === 18, "18 filtros de tipo");
+    check(await page.locator(".typepick").count() === 18, "18 filtros de tipo");
+    check(await page.locator(".genchip").count() === 10, "Filtro de generación (Todas + 9)");
     await page.fill("#q", "pikachu");
     await page.waitForTimeout(400);
     check(await page.locator(".dex-card:not([hidden])").count() === 1, "Búsqueda 'pikachu' deja 1 resultado");
@@ -89,6 +90,14 @@ try {
     const fireFlying = await page.locator(".dex-card:not([hidden]) .dex-card__name").allInnerTexts();
     check(fireFlying.includes("Charizard"), `Fuego + Volador: ${fireFlying.length} (${fireFlying.slice(0, 4).join(", ")}…)`);
     check(page.url().includes("tipo=fire%2Cflying") || page.url().includes("tipo=fire,flying"), "Filtros guardados en la URL");
+    check(await page.locator("#active-filters .token").count() === 2, "Filtros activos como etiquetas");
+    await page.click("#active-filters .token[data-key=flying]");
+    await page.waitForTimeout(300);
+    check(!page.url().includes("flying"), "Quitar un filtro desde su etiqueta");
+    await page.click(".genchip[data-gen='1']");
+    await page.waitForTimeout(300);
+    const kantoFire = await page.locator(".dex-card:not([hidden])").count();
+    check(kantoFire > 5 && kantoFire < 20, `Fuego en Kanto: ${kantoFire}`);
     const nameCode0 = await page.locator(".dex-card[data-id='772'] .dex-card__name").innerText();
     check(nameCode0 === "Código Cero", `Nombre en español en la Pokédex: ${nameCode0}`);
     await page.goto(origin + "pokedex.html?tipo=dragon");
@@ -102,8 +111,10 @@ try {
     check(await page.locator(".entry__name").innerText() === "Charizard", "Ficha 6: Charizard");
     check((await page.locator(".entry__genus").innerText()).length > 0, "Ficha con categoría");
     check((await page.locator(".entry__desc").innerText()).length > 20, "Ficha con descripción");
-    check(await page.locator(".typechart__cell").count() === 18, "Tabla de daño con 18 tipos");
-    check(await page.locator(".typechart__cell.type--rock .typechart__mult").innerText() === "×4", "Roca ×4 contra Charizard");
+    const dmgTotal = (await page.locator(".dmg__item").count()) + (await page.locator(".dmg__neutral-icons span").count());
+    check(dmgTotal === 18, `Daño recibido cubre los 18 tipos (${dmgTotal})`);
+    check(await page.locator(".dmg__group--weak .dmg__item.type--rock .dmg__mult").innerText() === "×4", "Roca ×4 contra Charizard");
+    check(await page.locator(".dmg__group--immune .dmg__item.type--ground").count() === 1, "Charizard inmune a Tierra");
     check(await page.locator(".evo__member").count() === 3, "3 etapas evolutivas");
     check((await page.locator(".evo").innerText()).includes("Nivel 16"), "Condición 'Nivel 16'");
     check(await page.locator("[data-cry]").count() === 1, "Botón de grito");

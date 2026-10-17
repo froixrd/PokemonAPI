@@ -1,14 +1,18 @@
 /* Pokédex estática — listado con búsqueda, filtros y orden. */
-import { ARTWORK, GENERATIONS, SPRITE, esc, isTyping, loadPokedex, normalize, pad, typeBadge } from "./common.js";
+import { ARTWORK, GENERATIONS, SPRITE, esc, isTyping, loadPokedex, normalize, pad } from "./common.js";
 
 const grid = document.getElementById("dex-grid");
 const form = document.querySelector("[data-filters]");
 const input = document.getElementById("q");
-const genSelect = document.getElementById("gen");
+const clearQ = document.querySelector("[data-clear-q]");
 const sortSelect = document.getElementById("orden");
 const counter = document.getElementById("result-count");
 const emptyState = document.getElementById("empty-state");
-const chipsBox = document.getElementById("type-chips");
+const genBox = document.getElementById("gen-chips");
+const typeBox = document.getElementById("type-chips");
+const activeBox = document.getElementById("active-filters");
+
+const X_ICON = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>';
 
 let data;
 try {
@@ -26,31 +30,35 @@ const species = data.species;
 const first = species[0];
 const last = species[species.length - 1];
 document.getElementById("intro-lead").textContent =
-    `${species.length} especies, de ${first.name} a ${last.name}. Busca por nombre o número, o filtra por tipo y generación.`;
+    `${species.length} especies, de ${first.name} a ${last.name}. Busca por nombre o número, o filtra por generación y tipo.`;
 
-genSelect.insertAdjacentHTML("beforeend", GENERATIONS
-    .filter((g) => species.some((s) => s.gen === g.n))
-    .map((g) => `<option value="${g.n}">Gen. ${g.roman} (${esc(g.region)})</option>`).join(""));
+const gens = GENERATIONS.filter((g) => species.some((s) => s.gen === g.n));
+genBox.innerHTML = `<button type="button" class="genchip" data-gen="" aria-pressed="true">Todas</button>` +
+    gens.map((g) => `<button type="button" class="genchip" data-gen="${g.n}" aria-pressed="false"><small>${g.roman}</small>${esc(g.region)}</button>`).join("");
 
-chipsBox.innerHTML = data.types
-    .map((t) => `<button type="button" class="type type--${esc(t.key)} chip" data-type="${esc(t.key)}" aria-pressed="false">${esc(t.name)}</button>`)
+typeBox.innerHTML = data.types
+    .map((t) => `<button type="button" class="typepick type--${esc(t.key)} chip" data-type="${esc(t.key)}" aria-pressed="false" title="${esc(t.name)}">${esc(t.name)}</button>`)
     .join("");
 
 grid.innerHTML = species.map((s) => {
     const types = s.types.map((k) => data.typeByKey.get(k)).filter(Boolean);
     return `<li class="dex-card tc-${esc(s.types[0] || "normal")}" data-id="${s.id}" data-name="${esc(s.name.toLowerCase())} ${esc(s.slug)}" data-gen="${s.gen}" data-types="${esc(s.types.join(" "))}">
 <a class="dex-card__link" href="pokemon.html?id=${s.id}">
-<span class="dex-card__num">${pad(s.id)}</span>
-<span class="dex-card__stage"><img src="${SPRITE(s.id)}" data-fallback="${ARTWORK(s.id)}" alt="" width="96" height="96" loading="lazy" decoding="async" /></span>
+<span class="dex-card__top">
+    <span class="dex-card__num">Nº ${pad(s.id)}</span>
+    <span class="dex-card__icons" aria-hidden="true">${types.map((t) => `<span class="type--${esc(t.key)}"></span>`).join("")}</span>
+</span>
+<span class="dex-card__art"><img src="${ARTWORK(s.id)}" data-fallback="${SPRITE(s.id)}" alt="" width="136" height="136" loading="lazy" decoding="async" /></span>
 <span class="dex-card__name">${esc(s.name)}</span>
-<span class="dex-card__types">${types.map((t) => typeBadge(t)).join("")}</span>
+<span class="dex-card__types">${types.map((t) => `<span class="dex-card__type type--${esc(t.key)}">${esc(t.name)}</span>`).join("")}</span>
 </a></li>`;
 }).join("");
 
 // ---------- Filtrar ----------
 
 const resetButtons = document.querySelectorAll("[data-reset]");
-const chips = Array.from(chipsBox.querySelectorAll("[data-type]"));
+const typeChips = Array.from(typeBox.querySelectorAll("[data-type]"));
+const genChips = Array.from(genBox.querySelectorAll("[data-gen]"));
 const total = grid.children.length;
 
 const cards = Array.from(grid.children, (el) => {
@@ -85,6 +93,22 @@ function matches(card) {
     return card.name.includes(state.q);
 }
 
+function renderActive() {
+    const tokens = [];
+    if (input.value.trim()) {
+        tokens.push(`<li><button type="button" class="token" data-remove="q" aria-label="Quitar búsqueda ${esc(input.value.trim())}">“${esc(input.value.trim())}”${X_ICON}</button></li>`);
+    }
+    if (state.gen) {
+        const g = gens.find((x) => String(x.n) === state.gen);
+        if (g) tokens.push(`<li><button type="button" class="token" data-remove="gen" aria-label="Quitar generación ${esc(g.region)}">Gen. ${g.roman} ${esc(g.region)}${X_ICON}</button></li>`);
+    }
+    for (const key of state.types) {
+        const t = data.typeByKey.get(key);
+        if (t) tokens.push(`<li><button type="button" class="token type--${esc(t.key)}" data-remove="type" data-key="${esc(t.key)}" aria-label="Quitar tipo ${esc(t.name)}">${esc(t.name)}${X_ICON}</button></li>`);
+    }
+    activeBox.innerHTML = tokens.join("");
+}
+
 function apply() {
     visible = [];
     for (const card of cards) {
@@ -102,11 +126,17 @@ function apply() {
 
     const filtered = !!(state.q || state.gen || state.types.length);
     counter.textContent = filtered
-        ? `${visible.length} ${visible.length === 1 ? "especie" : "especies"} de ${total}`
+        ? `${visible.length} de ${total}`
         : `${total} especies`;
     emptyState.hidden = visible.length > 0;
     resetButtons.forEach((b) => { if (b.closest("[data-filters]")) b.hidden = !filtered; });
-    chips.forEach((chip) => chip.setAttribute("aria-pressed", state.types.includes(chip.getAttribute("data-type")) ? "true" : "false"));
+    clearQ.hidden = !input.value;
+
+    typeChips.forEach((chip) => chip.setAttribute("aria-pressed", state.types.includes(chip.getAttribute("data-type")) ? "true" : "false"));
+    typeBox.classList.toggle("has-selection", state.types.length > 0);
+    genChips.forEach((chip) => chip.setAttribute("aria-pressed", chip.getAttribute("data-gen") === state.gen ? "true" : "false"));
+
+    renderActive();
     syncUrl();
 }
 
@@ -124,17 +154,27 @@ function readUrl() {
     const params = new URLSearchParams(location.search);
     input.value = params.get("q") || "";
     state.q = normalize(input.value);
-    state.gen = params.get("gen") || "";
-    genSelect.value = state.gen;
-    const known = chips.map((c) => c.getAttribute("data-type"));
+    const gen = params.get("gen") || "";
+    state.gen = genChips.some((c) => c.getAttribute("data-gen") === gen) ? gen : "";
+    const known = typeChips.map((c) => c.getAttribute("data-type"));
     state.types = (params.get("tipo") || "").split(",").filter((t) => known.includes(t)).slice(0, 2);
     state.sort = sorters[params.get("orden")] ? params.get("orden") : "num";
     sortSelect.value = state.sort;
 }
 
+function toggleType(type) {
+    const index = state.types.indexOf(type);
+    if (index >= 0) state.types.splice(index, 1);
+    else {
+        state.types.push(type);
+        if (state.types.length > 2) state.types.shift(); // como mucho dos tipos
+    }
+}
+
 let debounce;
 input.addEventListener("input", () => {
     clearTimeout(debounce);
+    clearQ.hidden = !input.value;
     debounce = setTimeout(() => { state.q = normalize(input.value); apply(); }, 100);
 });
 
@@ -153,27 +193,39 @@ input.addEventListener("keydown", (event) => {
     }
 });
 
-genSelect.addEventListener("change", () => { state.gen = genSelect.value; apply(); });
+clearQ.addEventListener("click", () => {
+    input.value = "";
+    state.q = "";
+    apply();
+    input.focus();
+});
+
 sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; apply(); });
 
-chips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-        const type = chip.getAttribute("data-type");
-        const index = state.types.indexOf(type);
-        if (index >= 0) state.types.splice(index, 1);
-        else {
-            state.types.push(type);
-            if (state.types.length > 2) state.types.shift(); // como mucho dos tipos
-        }
-        apply();
-    });
+genChips.forEach((chip) => chip.addEventListener("click", () => {
+    state.gen = chip.getAttribute("data-gen");
+    apply();
+}));
+
+typeChips.forEach((chip) => chip.addEventListener("click", () => {
+    toggleType(chip.getAttribute("data-type"));
+    apply();
+}));
+
+activeBox.addEventListener("click", (event) => {
+    const token = event.target.closest("[data-remove]");
+    if (!token) return;
+    const what = token.getAttribute("data-remove");
+    if (what === "q") { input.value = ""; state.q = ""; }
+    else if (what === "gen") state.gen = "";
+    else if (what === "type") toggleType(token.getAttribute("data-key"));
+    apply();
 });
 
 resetButtons.forEach((button) => {
     button.addEventListener("click", () => {
         input.value = "";
         state = { q: "", gen: "", types: [], sort: state.sort };
-        genSelect.value = "";
         apply();
         input.focus();
     });

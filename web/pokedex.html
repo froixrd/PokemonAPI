@@ -61,24 +61,20 @@
             <p class="intro__lead" id="intro-lead">Busca por nombre o número, o filtra por tipo y generación.</p>
         </section>
 
-        <form class="filters" role="search" data-filters onsubmit="return false">
-            <div class="filters__row">
-                <label class="field field--search">
+        <form class="finder" role="search" data-filters onsubmit="return false">
+            <div class="finder__top">
+                <label class="finder__search">
                     <span class="visually-hidden">Filtrar por nombre o número</span>
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
                     <input type="search" name="q" id="q" placeholder="Nombre o número" autocomplete="off" spellcheck="false" />
-                    <kbd class="field__hint" aria-hidden="true">/</kbd>
+                    <kbd aria-hidden="true">/</kbd>
+                    <button type="button" class="finder__clear" data-clear-q aria-label="Borrar búsqueda" hidden>
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                    </button>
                 </label>
-
-                <label class="field field--select">
-                    <span class="field__label">Generación</span>
-                    <select name="gen" id="gen">
-                        <option value="">Todas las generaciones</option>
-                    </select>
-                </label>
-
-                <label class="field field--select">
-                    <span class="field__label">Orden</span>
+                <label class="finder__sort">
+                    <span class="visually-hidden">Ordenar</span>
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3" /></svg>
                     <select name="orden" id="orden">
                         <option value="num">Número, ascendente</option>
                         <option value="num-desc">Número, descendente</option>
@@ -88,13 +84,19 @@
                 </label>
             </div>
 
-            <fieldset class="typefilter">
-                <legend class="typefilter__legend">Tipo (elige hasta dos)</legend>
-                <div class="typefilter__chips" id="type-chips"></div>
-            </fieldset>
+            <div class="finder__row">
+                <span class="finder__label" id="lbl-gen">Generación</span>
+                <div class="finder__scroller" role="group" aria-labelledby="lbl-gen" id="gen-chips"></div>
+            </div>
 
-            <div class="filters__status">
+            <div class="finder__row">
+                <span class="finder__label" id="lbl-type" title="Puedes elegir hasta dos tipos">Tipo</span>
+                <div class="finder__scroller finder__types" role="group" aria-labelledby="lbl-type" id="type-chips"></div>
+            </div>
+
+            <div class="finder__status">
                 <p id="result-count" aria-live="polite">Cargando especies…</p>
+                <ul class="finder__active" id="active-filters" aria-label="Filtros activos"></ul>
                 <button type="button" class="linkbutton" data-reset hidden>Quitar filtros</button>
             </div>
         </form>
