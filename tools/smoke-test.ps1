@@ -11,10 +11,28 @@ $ErrorActionPreference = "Stop"
 $Project = (Resolve-Path $Project).Path
 $bin = Join-Path $Project "bin"
 $failures = New-Object System.Collections.Generic.List[string]
+$results = New-Object System.Collections.Generic.List[string]
+$ci = $env:GITHUB_ACTIONS -eq "true"
+
+# En GitHub Actions los resultados también salen como anotaciones, visibles sin abrir el log.
+function Annotate([string]$level, [string]$text) {
+    if ($ci) { Write-Host ("::" + $level + "::" + ($text -replace "%", "%25" -replace "`r", "" -replace "`n", "%0A")) }
+}
+
+trap {
+    Annotate "error" ("Excepción en la prueba: " + $_.Exception.ToString() + " en " + $_.InvocationInfo.PositionMessage)
+    Write-Host $_.Exception.ToString() -ForegroundColor Red
+    exit 1
+}
 
 function Check([bool]$condition, [string]$message) {
-    if ($condition) { Write-Host "  OK   $message" }
-    else { Write-Host "  FALLO $message" -ForegroundColor Red; $failures.Add($message) }
+    if ($condition) { Write-Host "  OK   $message"; $results.Add("OK    $message") }
+    else {
+        Write-Host "  FALLO $message" -ForegroundColor Red
+        $failures.Add($message)
+        $results.Add("FALLO $message")
+        Annotate "error" "FALLO $message"
+    }
 }
 
 function Await($task) { return $task.GetAwaiter().GetResult() }
@@ -115,6 +133,8 @@ if (Test-Path $iis) {
 } else {
     Write-Host "IIS Express no está instalado: se omite la prueba de la web completa."
 }
+
+Annotate "notice" ("Resultados de la prueba:`n" + ($results -join "`n"))
 
 if ($failures.Count -gt 0) {
     Write-Host "`n$($failures.Count) comprobaciones fallidas." -ForegroundColor Red
