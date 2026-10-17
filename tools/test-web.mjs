@@ -70,12 +70,12 @@ try {
     await page.goto(origin);
     await page.fill("#hero-q", "eevee");
     await page.press("#hero-q", "Enter");
-    await page.waitForSelector(".dex-card", { timeout: 30000 });
+    await page.waitForSelector(".dex-card:not([hidden])", { timeout: 30000 });
     check(await page.locator(".dex-card:not([hidden])").count() === 1, "Buscador del banner filtra la Pokédex");
 
     // Pokédex
     await page.goto(origin + "pokedex.html");
-    await page.waitForSelector(".dex-card", { timeout: 30000 });
+    await page.waitForSelector(".dex-card:not([hidden])", { timeout: 30000 });
     const cards = await page.locator(".dex-card").count();
     check(cards >= 1025, `Pokédex con ${cards} tarjetas`);
     check(await page.locator(".chip").count() === 18, "18 filtros de tipo");
@@ -92,7 +92,7 @@ try {
     const nameCode0 = await page.locator(".dex-card[data-id='772'] .dex-card__name").innerText();
     check(nameCode0 === "Código Cero", `Nombre en español en la Pokédex: ${nameCode0}`);
     await page.goto(origin + "pokedex.html?tipo=dragon");
-    await page.waitForSelector(".dex-card", { timeout: 30000 });
+    await page.waitForSelector(".dex-card:not([hidden])", { timeout: 30000 });
     const dragons = await page.locator(".dex-card:not([hidden])").count();
     check(dragons > 50 && dragons < 200, `Enlace por tipo (dragón): ${dragons}`);
 
