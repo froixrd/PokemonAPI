@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Web estática: se generan al publicar (ver .github/workflows/pages.yml)
+web/css/
+web/data/

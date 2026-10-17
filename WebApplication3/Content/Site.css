@@ -1380,3 +1380,12 @@ kbd {
         scroll-behavior: auto !important;
     }
 }
+
+/* ---------- Carga (web estática) ---------- */
+
+.loading {
+    padding: 18vh 0;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 600;
+}
