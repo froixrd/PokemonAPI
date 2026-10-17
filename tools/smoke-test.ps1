@@ -116,6 +116,7 @@ if (Test-Path $iis) {
 
         $portada = Get-Page "/"
         Check ($portada.Status -eq 200 -and $portada.Content -match "dex-card" -and $portada.Content -match "Charizard") "Portada 200 con tarjetas"
+        Check ($portada.Content.Contains("Pokédex Nacional") -and $portada.Content.Contains("Generación")) "Portada con acentos correctos (UTF-8)"
         $p = Get-Page "/pokemon/25"
         $i = $p.Content.IndexOf("h-stats")
         $fragment = if ($i -ge 0) { $p.Content.Substring($i, [Math]::Min(60, $p.Content.Length - $i)) } else { "(sin h-stats)" }

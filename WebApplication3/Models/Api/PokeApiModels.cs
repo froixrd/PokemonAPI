@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 // Modelos de respuesta de PokeAPI (https://pokeapi.co/docs/v2).
