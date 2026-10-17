@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pokédex Nacional | Pokédex</title>
+    <meta name="description" content="Pokédex en español con los datos de PokeAPI: tipos, estadísticas, habilidades, debilidades y evoluciones de cada Pokémon." />
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1015" media="(prefers-color-scheme: dark)" />
+    <meta property="og:title" content="Pokédex Nacional | Pokédex" />
+    <meta property="og:description" content="Pokédex en español con los datos de PokeAPI: tipos, estadísticas, habilidades, debilidades y evoluciones de cada Pokémon." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://raw.githubusercontent.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="css/site.css" />
+    <script src="js/theme.js"></script>
+    <script type="module" src="js/lista.js"></script>
+</head>
+<body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="topbar">
+        <div class="topbar__inner">
+            <a class="logo" href="./" aria-label="Pokédex, ir a la portada">
+                <span class="logo__mark" aria-hidden="true"></span>
+                <span>Pokédex</span>
+            </a>
+            <nav class="menu" id="menu" aria-label="Principal">
+                <a href="./">Inicio</a>
+                <a href="pokedex.html" aria-current="page">Pokédex</a>
+                <a href="./#tipos">Tipos</a>
+                <a href="./#regiones">Regiones</a>
+                <a href="acerca.html">Acerca de</a>
+            </nav>
+            <div class="topbar__actions">
+                <button type="button" class="searchbtn" data-search-open aria-label="Buscar un Pokémon">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+                    <span>Buscar Pokémon</span>
+                    <kbd>/</kbd>
+                </button>
+                <a class="iconbtn" href="pokedex.html" data-random aria-label="Pokémon aleatorio" title="Pokémon aleatorio">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" /><circle cx="8.5" cy="8.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="15.5" cy="15.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" /><circle cx="15.5" cy="8.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="8.5" cy="15.5" r="1.1" fill="currentColor" stroke="none" /></svg>
+                </a>
+                <button type="button" class="iconbtn theme-toggle" data-theme-toggle aria-label="Cambiar entre modo claro y oscuro" title="Modo claro u oscuro">
+                    <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" /></svg>
+                    <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+                </button>
+                <button type="button" class="iconbtn menu-toggle" data-menu-toggle aria-controls="menu" aria-expanded="false" aria-label="Abrir menú">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="contenido" class="page" tabindex="-1">
+        <section class="intro">
+            <h1 class="intro__title">Pokédex</h1>
+            <p class="intro__lead" id="intro-lead">Busca por nombre o número, o filtra por tipo y generación.</p>
+        </section>
+
+        <form class="filters" role="search" data-filters onsubmit="return false">
+            <div class="filters__row">
+                <label class="field field--search">
+                    <span class="visually-hidden">Filtrar por nombre o número</span>
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+                    <input type="search" name="q" id="q" placeholder="Nombre o número" autocomplete="off" spellcheck="false" />
+                    <kbd class="field__hint" aria-hidden="true">/</kbd>
+                </label>
+
+                <label class="field field--select">
+                    <span class="field__label">Generación</span>
+                    <select name="gen" id="gen">
+                        <option value="">Todas las generaciones</option>
+                    </select>
+                </label>
+
+                <label class="field field--select">
+                    <span class="field__label">Orden</span>
+                    <select name="orden" id="orden">
+                        <option value="num">Número, ascendente</option>
+                        <option value="num-desc">Número, descendente</option>
+                        <option value="nombre">Nombre, A a Z</option>
+                        <option value="nombre-desc">Nombre, Z a A</option>
+                    </select>
+                </label>
+            </div>
+
+            <fieldset class="typefilter">
+                <legend class="typefilter__legend">Tipo (elige hasta dos)</legend>
+                <div class="typefilter__chips" id="type-chips"></div>
+            </fieldset>
+
+            <div class="filters__status">
+                <p id="result-count" aria-live="polite">Cargando especies…</p>
+                <button type="button" class="linkbutton" data-reset hidden>Quitar filtros</button>
+            </div>
+        </form>
+
+        <ol class="dex-grid" id="dex-grid"></ol>
+
+        <div class="empty" id="empty-state" hidden>
+            <p class="empty__title">Ningún Pokémon coincide con la búsqueda.</p>
+            <p>Prueba con otro nombre o número, o quita algún filtro.</p>
+            <button type="button" class="button" data-reset>Quitar filtros</button>
+        </div>
+
+        <div class="notice" id="load-error" hidden>
+            <h1>No se ha podido cargar la Pokédex</h1>
+            <p>Comprueba tu conexión y vuelve a intentarlo.</p>
+            <p><a class="button" href="pokedex.html">Reintentar</a></p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <p>Datos e imágenes de <a href="https://pokeapi.co" rel="noopener">PokeAPI</a>. Pokémon y sus nombres son marcas de Nintendo, Creatures y GAME FREAK.</p>
+            <p>Proyecto sin ánimo de lucro. <a href="https://github.com/froixrd/PokemonAPI" rel="noopener">Código en GitHub</a></p>
+        </div>
+    </footer>
+</body>
+</html>

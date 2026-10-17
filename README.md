@@ -4,10 +4,10 @@ Pokédex en español con todos los Pokémon de [PokeAPI](https://pokeapi.co): li
 
 **Web publicada:** https://froixrd.github.io/PokemonAPI/
 
-El repositorio tiene dos versiones con el mismo diseño:
+El repositorio tiene dos versiones:
 
-- `web/`: versión estática (HTML + JS) que se publica sola en GitHub Pages con cada push a `master`.
-- `WebApplication3/`: la aplicación ASP.NET MVC 5 original, para ejecutarla en IIS.
+- `web/`: versión estática (HTML + JS) que se publica sola en GitHub Pages con cada push a `master`. Es la versión principal, con portada, menú y diseño propios.
+- `WebApplication3/`: la aplicación ASP.NET MVC 5, para ejecutarla en IIS.
 
 ![Captura](https://github.com/froixrd/PokemonAPI/assets/88237009/47164cca-71fd-4a4c-a17a-37c52f5b92b0)
 
@@ -32,13 +32,15 @@ Todo pasa por `Services/PokeApiClient.cs`:
 
 ## Web estática (GitHub Pages)
 
-- `web/index.html`: listado. `web/pokemon.html?id=25` (o `?n=pikachu`): ficha.
+- `web/index.html`: portada con un Pokémon destacado distinto cada día, buscador y accesos por tipo y región.
+- `web/pokedex.html`: listado con filtros. `web/pokemon.html?id=25` (o `?n=pikachu`): ficha.
+- Desde cualquier página: búsqueda rápida (botón de la barra o tecla `/`) y Pokémon aleatorio.
 - Al publicar, `tools/build-data.mjs` genera `data/pokedex.json` con todas las especies, su nombre en español, tipos y generación, y la tabla de daño de los 18 tipos. Así el listado carga de una vez, sin 1000 llamadas desde el navegador.
 - Cada ficha pide a PokeAPI desde el navegador el Pokémon, la especie, las habilidades y la cadena evolutiva.
-- La hoja de estilos es la misma de la versión MVC (`WebApplication3/Content/Site.css`), se copia al publicar.
+- Estilos en `web/css/site.css` (tipografía Outfit, modo claro y oscuro).
 - El workflow `pages.yml` construye el sitio, lo prueba en Chromium contra la PokeAPI real (`tools/test-web.mjs`) y lo despliega. También se regenera cada lunes por si PokeAPI añade especies.
 
-Para verla en local: `node tools/build-data.mjs web/data/pokedex.json`, copiar `WebApplication3/Content/Site.css` a `web/css/site.css` y servir la carpeta `web` con cualquier servidor estático.
+Para verla en local: `node tools/build-data.mjs web/data/pokedex.json` y servir la carpeta `web` con cualquier servidor estático.
 
 ## Ejecutar la versión MVC en local
 

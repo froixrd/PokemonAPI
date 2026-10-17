@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Acerca de | Pokédex</title>
     <meta name="description" content="Qué es esta Pokédex y de dónde salen sus datos." />
-    <meta name="theme-color" content="#c8102e" />
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1015" media="(prefers-color-scheme: dark)" />
+    <meta property="og:title" content="Acerca de | Pokédex" />
+    <meta property="og:description" content="Qué es esta Pokédex y de dónde salen sus datos." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://raw.githubusercontent.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="css/site.css" />
     <script src="js/theme.js"></script>
     <script type="module" src="js/common.js"></script>
@@ -18,25 +22,40 @@
 <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-    <header class="chassis">
-        <div class="chassis__inner">
-            <a class="brand" href="./" aria-label="Pokédex, ir al inicio">
-                <span class="brand__lens" aria-hidden="true"></span>
-                <span class="brand__leds" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="brand__name">Pokédex</span>
+    <header class="topbar">
+        <div class="topbar__inner">
+            <a class="logo" href="./" aria-label="Pokédex, ir a la portada">
+                <span class="logo__mark" aria-hidden="true"></span>
+                <span>Pokédex</span>
             </a>
-            <nav class="topnav" aria-label="Principal">
-                <a href="./">Especies</a>
+            <nav class="menu" id="menu" aria-label="Principal">
+                <a href="./">Inicio</a>
+                <a href="pokedex.html">Pokédex</a>
+                <a href="./#tipos">Tipos</a>
+                <a href="./#regiones">Regiones</a>
                 <a href="acerca.html" aria-current="page">Acerca de</a>
-                <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar entre modo claro y oscuro">
-                    <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" /><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" /></svg>
-                    <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>
-                </button>
             </nav>
+            <div class="topbar__actions">
+                <button type="button" class="searchbtn" data-search-open aria-label="Buscar un Pokémon">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+                    <span>Buscar Pokémon</span>
+                    <kbd>/</kbd>
+                </button>
+                <a class="iconbtn" href="pokedex.html" data-random aria-label="Pokémon aleatorio" title="Pokémon aleatorio">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" /><circle cx="8.5" cy="8.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="15.5" cy="15.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" /><circle cx="15.5" cy="8.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="8.5" cy="15.5" r="1.1" fill="currentColor" stroke="none" /></svg>
+                </a>
+                <button type="button" class="iconbtn theme-toggle" data-theme-toggle aria-label="Cambiar entre modo claro y oscuro" title="Modo claro u oscuro">
+                    <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" /></svg>
+                    <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+                </button>
+                <button type="button" class="iconbtn menu-toggle" data-menu-toggle aria-controls="menu" aria-expanded="false" aria-label="Abrir menú">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg>
+                </button>
+            </div>
         </div>
     </header>
 
-    <main id="contenido" class="screen" tabindex="-1">
+    <main id="contenido" class="page" tabindex="-1">
         <article class="prose">
             <h1>Acerca de esta Pokédex</h1>
             <p>
@@ -46,28 +65,28 @@
 
             <h2>Qué puedes hacer</h2>
             <ul>
-                <li>Buscar cualquier especie por nombre o número y filtrar por tipo y generación.</li>
-                <li>Ver su ficha: descripción del juego, estadísticas base, habilidades, tabla de daño recibido y cadena evolutiva.</li>
-                <li>Cambiar a la ilustración variocolor y escuchar su grito.</li>
-                <li>Moverte entre fichas con las flechas del teclado, y pulsar <kbd>/</kbd> en el listado para buscar.</li>
+                <li>Buscar cualquier especie por nombre o número desde cualquier página, con el botón de búsqueda o la tecla <kbd>/</kbd>.</li>
+                <li>Filtrar la Pokédex por tipo y generación, y ordenarla por número o nombre.</li>
+                <li>Ver la ficha de cada especie: descripción del juego, estadísticas base, habilidades, tabla de daño recibido y cadena evolutiva.</li>
+                <li>Cambiar a la ilustración variocolor, escuchar su grito y pasar al anterior o siguiente con las flechas del teclado.</li>
             </ul>
 
             <h2>Cómo funciona</h2>
             <p>
                 Es una web estática publicada en GitHub Pages. Al publicarla se genera una lista con todas las especies,
-                sus nombres en español y sus tipos, así que el listado carga de una vez. Cada ficha pide sus datos a PokeAPI
+                sus nombres en español y sus tipos, así que la Pokédex carga de una vez. Cada ficha pide sus datos a PokeAPI
                 desde tu navegador. El código está en <a href="https://github.com/froixrd/PokemonAPI" rel="noopener">GitHub</a>.
             </p>
 
-            <p><a class="button" href="./">Ver todas las especies</a></p>
+            <p><a class="button" href="pokedex.html">Ir a la Pokédex</a></p>
         </article>
     </main>
 
     <footer class="footer">
-        <p>
-            Datos e imágenes de <a href="https://pokeapi.co" rel="noopener">PokeAPI</a>.
-            Pokémon y sus nombres son marcas de Nintendo, Creatures y GAME FREAK. Proyecto sin ánimo de lucro.
-        </p>
+        <div class="footer__inner">
+            <p>Datos e imágenes de <a href="https://pokeapi.co" rel="noopener">PokeAPI</a>. Pokémon y sus nombres son marcas de Nintendo, Creatures y GAME FREAK.</p>
+            <p>Proyecto sin ánimo de lucro. <a href="https://github.com/froixrd/PokemonAPI" rel="noopener">Código en GitHub</a></p>
+        </div>
     </footer>
 </body>
 </html>

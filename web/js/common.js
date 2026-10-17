@@ -160,3 +160,129 @@ document.addEventListener("error", (event) => {
         img.src = fallback;
     }
 }, true);
+
+// ---------- Menú móvil ----------
+
+const menu = document.getElementById("menu");
+const menuToggle = document.querySelector("[data-menu-toggle]");
+if (menu && menuToggle) {
+    const setOpen = (open) => {
+        menu.classList.toggle("is-open", open);
+        menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+        menuToggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+    };
+    menuToggle.addEventListener("click", () => setOpen(!menu.classList.contains("is-open")));
+    menu.addEventListener("click", (event) => { if (event.target.closest("a")) setOpen(false); });
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape") setOpen(false); });
+}
+
+// ---------- Pokémon aleatorio ----------
+
+document.addEventListener("click", async (event) => {
+    const link = event.target.closest("[data-random]");
+    if (!link) return;
+    event.preventDefault();
+    try {
+        const data = await loadPokedex();
+        const pick = data.species[Math.floor(Math.random() * data.species.length)];
+        location.href = "pokemon.html?id=" + pick.id;
+    } catch (err) {
+        location.href = "pokedex.html";
+    }
+});
+
+// ---------- Búsqueda rápida (botón de la barra o tecla "/") ----------
+
+let dialog;
+
+function searchResults(data, query) {
+    const q = normalize(query);
+    if (!q) return [];
+    if (/^\d+$/.test(q)) {
+        return data.species.filter((s) => String(s.id) === q || pad(s.id).startsWith(q)).slice(0, 8);
+    }
+    const starts = [];
+    const contains = [];
+    for (const s of data.species) {
+        const name = normalize(s.name);
+        const slug = normalize(s.slug.replace(/-/g, " "));
+        if (name.startsWith(q) || slug.startsWith(q)) starts.push(s);
+        else if (name.includes(q) || slug.includes(q)) contains.push(s);
+        if (starts.length >= 8) break;
+    }
+    return starts.concat(contains).slice(0, 8);
+}
+
+function buildDialog() {
+    dialog = document.createElement("dialog");
+    dialog.className = "quicksearch";
+    dialog.setAttribute("aria-label", "Buscar un Pokémon");
+    dialog.innerHTML = `
+<div class="quicksearch__field">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+    <input type="search" placeholder="Nombre o número del Pokémon" autocomplete="off" spellcheck="false" aria-label="Nombre o número" />
+    <kbd>Esc</kbd>
+</div>
+<ul class="quicksearch__results" role="listbox" aria-label="Resultados"></ul>
+<p class="quicksearch__foot"><span>↑ ↓ para moverte</span><span>Intro para abrir</span></p>`;
+    document.body.appendChild(dialog);
+
+    const input = dialog.querySelector("input");
+    const list = dialog.querySelector(".quicksearch__results");
+    let active = 0;
+
+    const highlight = () => {
+        list.querySelectorAll("a").forEach((a, i) => {
+            a.classList.toggle("is-active", i === active);
+            a.setAttribute("aria-selected", i === active ? "true" : "false");
+        });
+    };
+
+    const update = async () => {
+        const data = await loadPokedex();
+        const found = searchResults(data, input.value);
+        active = 0;
+        if (!input.value.trim()) {
+            list.innerHTML = `<li class="quicksearch__empty">Escribe un nombre (por ejemplo, Lucario) o un número.</li>`;
+            return;
+        }
+        if (!found.length) {
+            list.innerHTML = `<li class="quicksearch__empty">Ningún Pokémon con ese nombre o número.</li>`;
+            return;
+        }
+        list.innerHTML = found.map((s) => `<li><a href="pokemon.html?id=${s.id}" role="option">
+    <img src="${SPRITE(s.id)}" data-fallback="${ARTWORK(s.id)}" alt="" width="48" height="48" />
+    <span><span class="quicksearch__name">${esc(s.name)}</span><br /><span class="quicksearch__num">Nº ${pad(s.id)}</span></span>
+    <span class="quicksearch__types">${s.types.map((k) => data.typeByKey.get(k)).filter(Boolean).map((t) => typeBadge(t)).join("")}</span>
+</a></li>`).join("");
+        highlight();
+    };
+
+    input.addEventListener("input", update);
+    input.addEventListener("keydown", (event) => {
+        const links = list.querySelectorAll("a");
+        if (event.key === "ArrowDown" && links.length) { event.preventDefault(); active = (active + 1) % links.length; highlight(); }
+        else if (event.key === "ArrowUp" && links.length) { event.preventDefault(); active = (active - 1 + links.length) % links.length; highlight(); }
+        else if (event.key === "Enter" && links.length) { event.preventDefault(); links[active].click(); }
+    });
+    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    update();
+}
+
+export function openSearch() {
+    if (!dialog) buildDialog();
+    dialog.showModal();
+    const input = dialog.querySelector("input");
+    input.select();
+    input.focus();
+}
+
+document.querySelectorAll("[data-search-open]").forEach((button) => button.addEventListener("click", openSearch));
+
+document.addEventListener("keydown", (event) => {
+    // En la Pokédex "/" enfoca el filtro de la propia página (lo gestiona lista.js).
+    if (event.key === "/" && !isTyping(event) && !event.ctrlKey && !event.metaKey && !document.querySelector("[data-filters]")) {
+        event.preventDefault();
+        openSearch();
+    }
+});

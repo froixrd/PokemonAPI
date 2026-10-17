@@ -29,9 +29,8 @@ jobs:
 
       - name: Montar el sitio
         run: |
-          mkdir -p _site/css _site/data
+          mkdir -p _site/data
           cp -r web/* _site/
-          cp WebApplication3/Content/Site.css _site/css/site.css
           touch _site/.nojekyll
 
       - name: Generar datos del listado desde PokeAPI

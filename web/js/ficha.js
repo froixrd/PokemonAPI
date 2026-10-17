@@ -174,7 +174,7 @@ function render(p) {
     ${p.previous ? `<a class="pager__link pager__link--prev" rel="prev" data-nav="prev" href="${href(p.previous.id)}">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
         <span><small>${pad(p.previous.id)}</small> ${esc(p.previous.name)}</span></a>` : ""}
-    <a class="pager__all" href="./">Todas las especies</a>
+    <a class="pager__all" href="pokedex.html">Todas las especies</a>
     ${p.next ? `<a class="pager__link pager__link--next" rel="next" data-nav="next" href="${href(p.next.id)}">
         <span><small>${pad(p.next.id)}</small> ${esc(p.next.name)}</span>
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg></a>` : ""}
@@ -182,7 +182,6 @@ function render(p) {
 
     const specimen = `
 <figure class="specimen">
-    <span class="specimen__number" aria-hidden="true">${pad(p.id)}</span>
     ${p.artwork ? `<img class="specimen__img" id="artwork" src="${esc(p.artwork)}" data-normal="${esc(p.artwork)}" data-shiny="${esc(p.artworkShiny || "")}"
         alt="Ilustración oficial de ${esc(p.name)}" width="475" height="475" fetchpriority="high" />` : ""}
     <figcaption class="specimen__actions">
@@ -334,7 +333,7 @@ try {
     if (!id) {
         renderNotice("404", "Ese Pokémon no está en la Pokédex",
             "Revisa el número o el nombre del enlace, o búscalo en el listado.",
-            `<a class="button" href="./">Ir al listado</a>`);
+            `<a class="button" href="pokedex.html">Ir a la Pokédex</a>`);
     } else {
         render(await loadDetail(id, data));
         wire();
@@ -346,7 +345,7 @@ try {
     if (err instanceof NotFoundError) {
         renderNotice("404", "Ese Pokémon no está en la Pokédex",
             "Revisa el número o el nombre del enlace, o búscalo en el listado.",
-            `<a class="button" href="./">Ir al listado</a>`);
+            `<a class="button" href="pokedex.html">Ir a la Pokédex</a>`);
     } else {
         console.error(err);
         renderNotice("503", "PokeAPI no responde ahora mismo",

@@ -41,11 +41,43 @@ try {
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
 
-    // Listado
+    // Portada
     await page.goto(origin);
+    await page.waitForSelector(".typegrid a", { timeout: 30000 });
+    check(await page.locator(".typegrid a").count() === 18, "Portada: 18 accesos por tipo");
+    check(await page.locator(".regions a").count() === 9, "Portada: 9 regiones");
+    await page.waitForSelector(".hero__img.is-ready", { timeout: 30000 });
+    const featuredName = await page.locator("#featured-caption strong").innerText();
+    check(featuredName.length > 0, "Portada: Pokémon destacado " + featuredName);
+
+    // Búsqueda rápida desde el menú
+    await page.click("[data-search-open]");
+    await page.keyboard.type("pikachu");
+    await page.waitForSelector(".quicksearch__results a", { timeout: 10000 });
+    check(await page.locator(".quicksearch__results a").count() >= 1, "Búsqueda rápida encuentra a Pikachu");
+    await page.keyboard.press("Enter");
+    await page.waitForURL(/pokemon\.html\?id=25$/, { timeout: 15000 });
+    check(true, "Intro en la búsqueda rápida abre la ficha 25");
+
+    // Pokémon aleatorio
+    await page.goto(origin);
+    await page.waitForSelector(".typegrid a", { timeout: 30000 });
+    await page.click(".topbar [data-random]");
+    await page.waitForURL(/pokemon\.html\?id=\d+$/, { timeout: 15000 });
+    check(true, "Botón aleatorio abre una ficha");
+
+    // Buscador del banner lleva a la Pokédex filtrada
+    await page.goto(origin);
+    await page.fill("#hero-q", "eevee");
+    await page.press("#hero-q", "Enter");
+    await page.waitForSelector(".dex-card", { timeout: 30000 });
+    check(await page.locator(".dex-card:not([hidden])").count() === 1, "Buscador del banner filtra la Pokédex");
+
+    // Pokédex
+    await page.goto(origin + "pokedex.html");
     await page.waitForSelector(".dex-card", { timeout: 30000 });
     const cards = await page.locator(".dex-card").count();
-    check(cards >= 1025, `Listado con ${cards} tarjetas`);
+    check(cards >= 1025, `Pokédex con ${cards} tarjetas`);
     check(await page.locator(".chip").count() === 18, "18 filtros de tipo");
     await page.fill("#q", "pikachu");
     await page.waitForTimeout(400);
@@ -58,7 +90,11 @@ try {
     check(fireFlying.includes("Charizard"), `Fuego + Volador: ${fireFlying.length} (${fireFlying.slice(0, 4).join(", ")}…)`);
     check(page.url().includes("tipo=fire%2Cflying") || page.url().includes("tipo=fire,flying"), "Filtros guardados en la URL");
     const nameCode0 = await page.locator(".dex-card[data-id='772'] .dex-card__name").innerText();
-    check(nameCode0 === "Código Cero", `Nombre en español en el listado: ${nameCode0}`);
+    check(nameCode0 === "Código Cero", `Nombre en español en la Pokédex: ${nameCode0}`);
+    await page.goto(origin + "pokedex.html?tipo=dragon");
+    await page.waitForSelector(".dex-card", { timeout: 30000 });
+    const dragons = await page.locator(".dex-card:not([hidden])").count();
+    check(dragons > 50 && dragons < 200, `Enlace por tipo (dragón): ${dragons}`);
 
     // Ficha
     await page.goto(origin + "pokemon.html?id=6");
