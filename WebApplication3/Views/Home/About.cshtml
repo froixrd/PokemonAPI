@@ -1,9 +1,29 @@
-﻿@{
-    ViewBag.Title = "About";
+@{
+    ViewBag.Title = "Acerca de";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
 
-    <p>Use this area to provide additional information.</p>
-</main>
+<article class="prose">
+    <h1>Acerca de esta Pokédex</h1>
+    <p>
+        Una Pokédex en español hecha con ASP.NET MVC 5. Todos los datos salen de
+        <a href="https://pokeapi.co" rel="noopener">PokeAPI</a>, una API pública y gratuita mantenida por la comunidad,
+        y las imágenes del repositorio de sprites de PokeAPI.
+    </p>
+
+    <h2>Qué puedes hacer</h2>
+    <ul>
+        <li>Buscar cualquier especie por nombre o número y filtrar por tipo y generación.</li>
+        <li>Ver su ficha: descripción del juego, estadísticas base, habilidades, tabla de daño recibido y cadena evolutiva.</li>
+        <li>Cambiar a la ilustración variocolor y escuchar su grito.</li>
+        <li>Moverte entre fichas con las flechas del teclado, y pulsar <kbd>/</kbd> en el listado para buscar.</li>
+    </ul>
+
+    <h2>Cómo usa la API</h2>
+    <p>
+        El servidor guarda en memoria durante 12 horas cada respuesta de PokeAPI y agrupa las peticiones simultáneas a la
+        misma dirección, así que cada dato se pide una sola vez aunque lleguen muchas visitas a la vez. Si PokeAPI falla,
+        reintenta con esperas crecientes antes de mostrar un aviso.
+    </p>
+
+    <p><a class="button" href="@Url.Action("Index", "Home")">Ver todas las especies</a></p>
+</article>

@@ -1,0 +1,10 @@
+@{
+    ViewBag.Title = "Pokémon no encontrado";
+}
+
+<section class="notice">
+    <p class="notice__code" aria-hidden="true">404</p>
+    <h1>Ese Pokémon no está en la Pokédex</h1>
+    <p>Revisa el número o el nombre de la dirección, o búscalo en el listado.</p>
+    <p><a class="button" href="@Url.Action("Index", "Home")">Ir al listado</a></p>
+</section>

@@ -1,0 +1,203 @@
+@model PokemonDetailViewModel
+@{
+    ViewBag.Title = Model.Name + " (Nº " + Model.Number + ")";
+    ViewBag.Description = string.IsNullOrEmpty(Model.Description)
+        ? Model.Name + ": tipos, estadísticas, habilidades y evoluciones."
+        : Model.Description;
+    ViewBag.Image = Model.ArtworkUrl;
+    var es = System.Globalization.CultureInfo.GetCultureInfo("es-ES");
+}
+
+<article class="entry tc-@Model.PrimaryType">
+    <nav class="pager" aria-label="Pokémon anterior y siguiente">
+        @if (Model.Previous != null)
+        {
+            <a class="pager__link pager__link--prev" rel="prev" data-nav="prev" href="@Url.Action("Pokemon", "Home", new { id = Model.Previous.Id })">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+                <span><small>@Model.Previous.Number</small> @Model.Previous.Name</span>
+            </a>
+        }
+        <a class="pager__all" href="@Url.Action("Index", "Home")">Todas las especies</a>
+        @if (Model.Next != null)
+        {
+            <a class="pager__link pager__link--next" rel="next" data-nav="next" href="@Url.Action("Pokemon", "Home", new { id = Model.Next.Id })">
+                <span><small>@Model.Next.Number</small> @Model.Next.Name</span>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+            </a>
+        }
+    </nav>
+
+    <div class="entry__hero">
+        <figure class="specimen">
+            <span class="specimen__number" aria-hidden="true">@Model.Number</span>
+            @if (!string.IsNullOrEmpty(Model.ArtworkUrl))
+            {
+                <img class="specimen__img" id="artwork" src="@Model.ArtworkUrl"
+                     data-normal="@Model.ArtworkUrl" data-shiny="@Model.ArtworkShinyUrl"
+                     alt="Ilustración oficial de @Model.Name" width="475" height="475" fetchpriority="high" />
+            }
+            <figcaption class="specimen__actions">
+                @if (!string.IsNullOrEmpty(Model.ArtworkShinyUrl))
+                {
+                    <button type="button" class="button button--ghost" data-shiny-toggle aria-pressed="false">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2L12 19.5l-2.2-6.3L3.5 11l6.3-2.2z" /></svg>
+                        <span data-shiny-label>Ver variocolor</span>
+                    </button>
+                }
+                @if (!string.IsNullOrEmpty(Model.CryUrl))
+                {
+                    <button type="button" class="button button--ghost" data-cry="@Model.CryUrl">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></svg>
+                        Escuchar grito
+                    </button>
+                }
+            </figcaption>
+        </figure>
+
+        <div class="entry__summary">
+            <p class="entry__number">Nº @Model.Number</p>
+            <h1 class="entry__name">@Model.Name</h1>
+            @if (!string.IsNullOrEmpty(Model.Genus))
+            {
+                <p class="entry__genus">@Model.Genus</p>
+            }
+
+            <p class="entry__types">
+                @foreach (var t in Model.Types)
+                {
+                    <span class="type type--@t.Key type--lg">@t.Name</span>
+                }
+                @if (Model.IsLegendary)
+                {
+                    <span class="tag">Legendario</span>
+                }
+                @if (Model.IsMythical)
+                {
+                    <span class="tag">Singular</span>
+                }
+                @if (Model.IsBaby)
+                {
+                    <span class="tag">Bebé</span>
+                }
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p class="entry__desc">@Model.Description</p>
+            }
+
+            <dl class="facts">
+                <div><dt>Altura</dt><dd>@Model.HeightMeters.ToString("0.0", es) m</dd></div>
+                <div><dt>Peso</dt><dd>@Model.WeightKg.ToString("0.0", es) kg</dd></div>
+                <div><dt>Generación</dt><dd>@Model.Generation.Roman, @Model.Generation.Region</dd></div>
+                @if (!string.IsNullOrEmpty(Model.Habitat))
+                {
+                    <div><dt>Hábitat</dt><dd>@Model.Habitat</dd></div>
+                }
+                <div><dt>Ratio de captura</dt><dd>@Model.CaptureRate</dd></div>
+                @if (Model.BaseExperience.HasValue)
+                {
+                    <div><dt>Experiencia base</dt><dd>@Model.BaseExperience</dd></div>
+                }
+            </dl>
+        </div>
+    </div>
+
+    <div class="entry__panels">
+        <section class="panel panel--stats" aria-labelledby="h-stats">
+            <h2 id="h-stats">Estadísticas base</h2>
+            <table class="stats">
+                <tbody>
+                    @foreach (var s in Model.Stats)
+                    {
+                        <tr>
+                            <th scope="row">@s.Name</th>
+                            <td class="stats__value">@s.Value</td>
+                            <td class="stats__bar" aria-hidden="true">
+                                <span class="bar bar--@s.Band" style="--v: @(s.Percent)%"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td class="stats__value">@Model.StatTotal</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+
+        <section class="panel" aria-labelledby="h-matchups">
+            <h2 id="h-matchups">Daño recibido</h2>
+            <dl class="matchups">
+                @foreach (var g in Model.Matchups)
+                {
+                    <div class="matchups__row matchups__row--@g.Css">
+                        <dt><strong>@g.Label</strong> @g.Description</dt>
+                        <dd>
+                            @foreach (var t in g.Types)
+                            {
+                                <span class="type type--@t.Key">@t.Name</span>
+                            }
+                        </dd>
+                    </div>
+                }
+            </dl>
+        </section>
+
+        <section class="panel panel--wide" aria-labelledby="h-abilities">
+            <h2 id="h-abilities">Habilidades</h2>
+            <ul class="abilities">
+                @foreach (var a in Model.Abilities)
+                {
+                    <li>
+                        <p class="abilities__name">
+                            @a.Name
+                            @if (a.IsHidden)
+                            {
+                                <span class="tag tag--quiet">Oculta</span>
+                            }
+                        </p>
+                        @if (!string.IsNullOrEmpty(a.Description))
+                        {
+                            <p class="abilities__desc">@a.Description</p>
+                        }
+                    </li>
+                }
+            </ul>
+        </section>
+
+        <section class="panel panel--wide" aria-labelledby="h-evolution">
+            <h2 id="h-evolution">Evolución</h2>
+            @if (Model.EvolutionStages.Count <= 1)
+            {
+                <p class="muted">@Model.Name no evoluciona.</p>
+            }
+            else
+            {
+                <ol class="evo">
+                    @foreach (var stage in Model.EvolutionStages)
+                    {
+                        <li class="evo__stage">
+                            <ul class="evo__members">
+                                @foreach (var m in stage)
+                                {
+                                    <li class="evo__member @(m.IsCurrent ? "is-current" : "")">
+                                        <span class="evo__condition">@m.Condition</span>
+                                        <a href="@Url.Action("Pokemon", "Home", new { id = m.Id })" @(m.IsCurrent ? "aria-current=page" : "")>
+                                            <img src="@m.ImageUrl" alt="" width="120" height="120" loading="lazy" decoding="async" />
+                                            <span class="evo__name">@m.Name</span>
+                                            <span class="evo__num">@m.Id.ToString("0000")</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ol>
+            }
+        </section>
+    </div>
+</article>

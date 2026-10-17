@@ -1,0 +1,28 @@
+name: Compilar y probar
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - uses: nuget/setup-nuget@v2
+
+      - name: Restaurar paquetes NuGet
+        run: nuget restore WebApplication3.sln
+
+      - name: Compilar (incluidas las vistas Razor)
+        run: msbuild WebApplication3.sln /p:Configuration=Release /p:MvcBuildViews=true /m /v:minimal
+
+      - name: Prueba de humo contra PokeAPI
+        shell: powershell
+        run: ./tools/smoke-test.ps1

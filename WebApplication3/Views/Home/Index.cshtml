@@ -1,23 +1,95 @@
-﻿@model List<WebApplication3.Models.Pokemon>
-
+﻿@model PokedexViewModel
 @{
-    ViewBag.Title = "Lista de Pokémon";
+    ViewBag.Title = "Pokédex Nacional";
+    var first = Model.Entries.Count > 0 ? Model.Entries[0] : null;
+    var last = Model.Entries.Count > 0 ? Model.Entries[Model.Entries.Count - 1] : null;
 }
 
-<h2>Lista de Pokémon</h2>
+<section class="intro">
+    <h1 class="intro__title">Pokédex Nacional</h1>
+    @if (first != null)
+    {
+        <p class="intro__lead">
+            @Model.Entries.Count especies, de @first.Name a @last.Name. Busca por nombre o número,
+            o filtra por tipo y generación.
+        </p>
+    }
+</section>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var pokemon in Model)
-        {
-            <tr>
-                <td>@pokemon.Name</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<form class="filters" role="search" data-filters onsubmit="return false">
+    <div class="filters__row">
+        <label class="field field--search">
+            <span class="visually-hidden">Buscar Pokémon</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></svg>
+            <input type="search" name="q" id="q" placeholder="Nombre o número" autocomplete="off" spellcheck="false" />
+            <kbd class="field__hint" aria-hidden="true">/</kbd>
+        </label>
+
+        <label class="field field--select">
+            <span class="field__label">Generación</span>
+            <select name="gen" id="gen">
+                <option value="">Todas</option>
+                @foreach (var g in Model.Generations)
+                {
+                    <option value="@g.Number">@g.Label</option>
+                }
+            </select>
+        </label>
+
+        <label class="field field--select">
+            <span class="field__label">Orden</span>
+            <select name="orden" id="orden">
+                <option value="num">Número, ascendente</option>
+                <option value="num-desc">Número, descendente</option>
+                <option value="nombre">Nombre, A a Z</option>
+                <option value="nombre-desc">Nombre, Z a A</option>
+            </select>
+        </label>
+    </div>
+
+    <fieldset class="typefilter">
+        <legend class="typefilter__legend">Tipo <span class="typefilter__note">(elige hasta dos)</span></legend>
+        <div class="typefilter__chips">
+            @foreach (var t in Model.Types)
+            {
+                <button type="button" class="type type--@t.Key chip" data-type="@t.Key" aria-pressed="false">@t.Name</button>
+            }
+        </div>
+    </fieldset>
+
+    <div class="filters__status">
+        <p id="result-count" aria-live="polite">@Model.Entries.Count especies</p>
+        <button type="button" class="linkbutton" data-reset hidden>Quitar filtros</button>
+    </div>
+</form>
+
+<ol class="dex-grid" id="dex-grid">
+    @foreach (var p in Model.Entries)
+    {
+        <li class="dex-card tc-@p.PrimaryType"
+            data-id="@p.Id"
+            data-name="@p.Name.ToLowerInvariant() @p.Slug"
+            data-gen="@p.Generation"
+            data-types="@string.Join(" ", p.Types)">
+            <a class="dex-card__link" href="@Url.Action("Pokemon", "Home", new { id = p.Id })">
+                <span class="dex-card__num">@p.Number</span>
+                <span class="dex-card__stage">
+                    <img src="@p.SpriteUrl" data-fallback="@p.ArtworkUrl" alt="" width="96" height="96" loading="lazy" decoding="async" />
+                </span>
+                <span class="dex-card__name">@p.Name</span>
+                <span class="dex-card__types">
+                    @foreach (var t in p.Types)
+                    {
+                        <span class="type type--@t">@Model.TypeNames[t]</span>
+                    }
+                </span>
+            </a>
+        </li>
+    }
+</ol>
+
+<div class="empty" id="empty-state" hidden>
+    <p class="empty__title">Ningún Pokémon coincide con la búsqueda.</p>
+    <p>Prueba con otro nombre o número, o quita algún filtro.</p>
+    <button type="button" class="button" data-reset>Quitar filtros</button>
+</div>

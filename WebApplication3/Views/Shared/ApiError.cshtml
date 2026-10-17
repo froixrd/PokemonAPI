@@ -1,0 +1,10 @@
+@{
+    ViewBag.Title = "PokeAPI no responde";
+}
+
+<section class="notice">
+    <p class="notice__code" aria-hidden="true">503</p>
+    <h1>PokeAPI no responde ahora mismo</h1>
+    <p>Los datos vienen de PokeAPI y no ha contestado tras varios intentos. Suele volver en unos minutos.</p>
+    <p><a class="button" href="@Request.RawUrl">Reintentar</a></p>
+</section>
