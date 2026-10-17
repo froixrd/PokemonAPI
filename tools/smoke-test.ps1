@@ -117,7 +117,11 @@ if (Test-Path $iis) {
         $portada = Get-Page "/"
         Check ($portada.Status -eq 200 -and $portada.Content -match "dex-card" -and $portada.Content -match "Charizard") "Portada 200 con tarjetas"
         $p = Get-Page "/pokemon/25"
-        Check ($p.Status -eq 200 -and $p.Content -match "Pikachu" -and $p.Content -match "Estadísticas base") "Ficha /pokemon/25"
+        $i = $p.Content.IndexOf("h-stats")
+        $fragment = if ($i -ge 0) { $p.Content.Substring($i, [Math]::Min(60, $p.Content.Length - $i)) } else { "(sin h-stats)" }
+        Check ($p.Status -eq 200) "Ficha /pokemon/25 responde ($($p.Status))"
+        Check ($p.Content -match "Pikachu") "Ficha /pokemon/25 muestra a Pikachu"
+        Check ($p.Content.Contains("Estadísticas base")) "Ficha /pokemon/25 con estadísticas: $fragment"
         $p = Get-Page "/pokemon/133"
         Check ($p.Status -eq 200 -and $p.Content -match "Vaporeon") "Ficha /pokemon/133 con evoluciones"
         $r = Get-Page "/pokemon/pikachu"
