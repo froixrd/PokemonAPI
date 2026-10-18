@@ -2,13 +2,17 @@
 // Uso: node tools/test-web.mjs <carpeta del sitio>
 // La sirve bajo /PokemonAPI/ (como en GitHub Pages) y deja los resultados como anotaciones de GitHub Actions.
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { chromium } from "playwright";
 
 const ROOT = process.argv[2] || "_site";
 const BASE = "/PokemonAPI/";
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml" };
+const SCREENS = process.env.SCREENS_DIR || "";
+const TYPES = {
+    ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+    ".json": "application/json", ".svg": "image/svg+xml", ".webp": "image/webp", ".png": "image/png", ".woff2": "font/woff2"
+};
 
 const server = createServer(async (req, res) => {
     let path = decodeURIComponent(new URL(req.url, "http://x").pathname);
@@ -146,7 +150,45 @@ try {
     await page.goto(origin + "acerca.html");
     check(await page.locator(".prose h1").count() === 1, "Acerca de");
 
+    // Imágenes propias y peso de la carga inicial
+    const thumb = await page.goto(origin + "img/p/25.webp");
+    check(thumb.status() === 200 && (await thumb.body()).length < 30000, `Miniatura WebP propia (${(await thumb.body()).length} bytes)`);
+    for (const [name, path, selector] of [["Portada", "", ".typegrid a"], ["Pokédex", "pokedex.html", ".dex-card"], ["Ficha", "pokemon.html?id=6", ".entry__name"]]) {
+        const t0 = Date.now();
+        await page.goto(origin + path);
+        await page.waitForSelector(selector, { timeout: 30000 });
+        const ready = Date.now() - t0;
+        await page.waitForLoadState("load");
+        const stats = await page.evaluate(() => {
+            const res = performance.getEntriesByType("resource");
+            const local = res.filter((r) => r.name.startsWith(location.origin));
+            return { requests: res.length, localKb: Math.round(local.reduce((sum, r) => sum + (r.encodedBodySize || 0), 0) / 1024) };
+        });
+        check(ready < 8000, `${name}: contenido en ${ready} ms, ${stats.requests} peticiones, ${stats.localKb} KB propios`);
+    }
+
     check(errors.length === 0, "Sin errores de JavaScript" + (errors.length ? ": " + errors.join(" | ") : ""));
+
+    // Capturas para revisar el diseño con datos reales
+    if (SCREENS) {
+        await mkdir(SCREENS, { recursive: true });
+        const shots = [["inicio", ""], ["pokedex", "pokedex.html"], ["pokedex-filtro", "pokedex.html?tipo=dragon&gen=4"], ["ficha", "pokemon.html?id=6"], ["ficha-eevee", "pokemon.html?id=133"]];
+        for (const [w, h, label, scheme] of [[1280, 900, "escritorio", "light"], [390, 844, "movil", "dark"]]) {
+            const ctx = await browser.newContext({ viewport: { width: w, height: h }, colorScheme: scheme, deviceScaleFactor: 1 });
+            const shot = await ctx.newPage();
+            for (const [name, path] of shots) {
+                await shot.goto(origin + path);
+                await shot.waitForSelector(".typegrid a, .dex-card, .entry__name", { timeout: 30000 });
+                await shot.waitForLoadState("networkidle").catch(() => {});
+                await shot.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+                await shot.waitForTimeout(800);
+                await shot.evaluate(() => window.scrollTo(0, 0));
+                await shot.waitForTimeout(300);
+                await shot.screenshot({ path: `${SCREENS}/${name}-${label}.png`, fullPage: name !== "pokedex" && name !== "pokedex-filtro" });
+            }
+            await ctx.close();
+        }
+    }
 } catch (err) {
     check(false, "Excepción: " + err.message);
 } finally {

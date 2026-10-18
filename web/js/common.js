@@ -3,6 +3,10 @@
 export const API = "https://pokeapi.co/api/v2/";
 export const SPRITE = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
 export const ARTWORK = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+/** Miniatura WebP generada al publicar (unos 8 KB frente a 100-300 KB de la ilustración original). */
+export const THUMB = (id) => `img/p/${id}.webp`;
+/** Ilustración mediana para el banner de la portada. */
+export const HERO = (id) => `img/hero/${id}.webp`;
 
 export const GENERATIONS = [
     { n: 1, roman: "I", region: "Kanto" },
@@ -61,7 +65,8 @@ let pokedexPromise;
 /** data/pokedex.json: especies (nombre en español, tipos, generación) y los 18 tipos con su tabla de daño. */
 export function loadPokedex() {
     if (!pokedexPromise) {
-        pokedexPromise = fetch("data/pokedex.json", { cache: "no-cache" }).then((res) => {
+        // Misma petición que el <link rel="preload"> de la página, así se reutiliza.
+        pokedexPromise = fetch("data/pokedex.json").then((res) => {
             if (!res.ok) throw new Error("No se pudo cargar data/pokedex.json (" + res.status + ")");
             return res.json();
         }).then((data) => {
@@ -251,7 +256,7 @@ function buildDialog() {
             return;
         }
         list.innerHTML = found.map((s) => `<li><a href="pokemon.html?id=${s.id}" role="option">
-    <img src="${SPRITE(s.id)}" data-fallback="${ARTWORK(s.id)}" alt="" width="48" height="48" />
+    <img src="${THUMB(s.id)}" data-fallback="${ARTWORK(s.id)}" alt="" width="48" height="48" />
     <span><span class="quicksearch__name">${esc(s.name)}</span><br /><span class="quicksearch__num">Nº ${pad(s.id)}</span></span>
     <span class="quicksearch__types">${s.types.map((k) => data.typeByKey.get(k)).filter(Boolean).map((t) => typeBadge(t)).join("")}</span>
 </a></li>`).join("");

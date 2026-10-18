@@ -37,7 +37,12 @@ Todo pasa por `Services/PokeApiClient.cs`:
 - Desde cualquier página: búsqueda rápida (botón de la barra o tecla `/`) y Pokémon aleatorio.
 - Al publicar, `tools/build-data.mjs` genera `data/pokedex.json` con todas las especies, su nombre en español, tipos y generación, y la tabla de daño de los 18 tipos. Así el listado carga de una vez, sin 1000 llamadas desde el navegador.
 - Cada ficha pide a PokeAPI desde el navegador el Pokémon, la especie, las habilidades y la cadena evolutiva.
-- Estilos en `web/css/site.css` (tipografía Outfit, modo claro y oscuro).
+- Estilos en `web/css/site.css` (tipografía Outfit servida desde la propia web, modo claro y oscuro).
+- Para que cargue rápido, al publicar:
+  - `tools/build-thumbs.mjs` convierte las ilustraciones oficiales en miniaturas WebP de unos 9 KB (`img/p/<id>.webp`, en lugar de 100-300 KB cada una) y las del banner a 560 px (`img/hero/<id>.webp`). Se guardan en caché entre publicaciones.
+  - esbuild empaqueta y minifica el JavaScript (un solo archivo por página) y minifica el CSS.
+  - La lista de especies se precarga desde el `<head>` y la ficha pide a PokeAPI todo lo que puede en paralelo.
+- La prueba (`tools/test-web.mjs`) mide la carga de cada página y guarda capturas en la rama `capturas`.
 - El workflow `pages.yml` construye el sitio, lo prueba en Chromium contra la PokeAPI real (`tools/test-web.mjs`) y lo despliega. También se regenera cada lunes por si PokeAPI añade especies.
 
 Para verla en local: `node tools/build-data.mjs web/data/pokedex.json` y servir la carpeta `web` con cualquier servidor estático.

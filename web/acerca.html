@@ -11,12 +11,10 @@
     <meta property="og:description" content="Qué es esta Pokédex y de dónde salen sus datos." />
     <meta property="og:image" content="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://raw.githubusercontent.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="preload" href="fonts/outfit.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="css/site.css" />
-    <script src="js/theme.js"></script>
+    <script>try{var t=localStorage.getItem("pokedex-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
     <script type="module" src="js/common.js"></script>
 </head>
 <body>
@@ -25,7 +23,7 @@
     <header class="topbar">
         <div class="topbar__inner">
             <a class="logo" href="./" aria-label="Pokédex, ir a la portada">
-                <span class="logo__mark" aria-hidden="true"></span>
+                <img class="logo__mark" src="favicon.svg" alt="" width="30" height="30" />
                 <span>Pokédex</span>
             </a>
             <nav class="menu" id="menu" aria-label="Principal">

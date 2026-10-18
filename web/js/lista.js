@@ -1,5 +1,5 @@
 /* Pokédex estática — listado con búsqueda, filtros y orden. */
-import { ARTWORK, GENERATIONS, SPRITE, esc, isTyping, loadPokedex, normalize, pad } from "./common.js";
+import { ARTWORK, GENERATIONS, THUMB, esc, isTyping, loadPokedex, normalize, pad } from "./common.js";
 
 const grid = document.getElementById("dex-grid");
 const form = document.querySelector("[data-filters]");
@@ -40,7 +40,10 @@ typeBox.innerHTML = data.types
     .map((t) => `<button type="button" class="typepick type--${esc(t.key)} chip" data-type="${esc(t.key)}" aria-pressed="false" title="${esc(t.name)}">${esc(t.name)}</button>`)
     .join("");
 
-grid.innerHTML = species.map((s) => {
+// Las primeras tarjetas se ven nada más entrar: cargarlas sin esperar al scroll.
+const EAGER = 12;
+
+grid.innerHTML = species.map((s, i) => {
     const types = s.types.map((k) => data.typeByKey.get(k)).filter(Boolean);
     return `<li class="dex-card tc-${esc(s.types[0] || "normal")}" data-id="${s.id}" data-name="${esc(s.name.toLowerCase())} ${esc(s.slug)}" data-gen="${s.gen}" data-types="${esc(s.types.join(" "))}">
 <a class="dex-card__link" href="pokemon.html?id=${s.id}">
@@ -48,7 +51,7 @@ grid.innerHTML = species.map((s) => {
     <span class="dex-card__num">Nº ${pad(s.id)}</span>
     <span class="dex-card__icons" aria-hidden="true">${types.map((t) => `<span class="type--${esc(t.key)}"></span>`).join("")}</span>
 </span>
-<span class="dex-card__art"><img src="${ARTWORK(s.id)}" data-fallback="${SPRITE(s.id)}" alt="" width="136" height="136" loading="lazy" decoding="async" /></span>
+<span class="dex-card__art"><img src="${THUMB(s.id)}" data-fallback="${ARTWORK(s.id)}" alt="" width="136" height="136" ${i < EAGER ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" /></span>
 <span class="dex-card__name">${esc(s.name)}</span>
 <span class="dex-card__types">${types.map((t) => `<span class="dex-card__type type--${esc(t.key)}">${esc(t.name)}</span>`).join("")}</span>
 </a></li>`;

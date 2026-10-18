@@ -19,7 +19,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    permissions:
+      contents: write # para guardar las capturas de la prueba en la rama "capturas"
     steps:
       - uses: actions/checkout@v4
 
@@ -27,20 +29,48 @@ jobs:
         with:
           node-version: 22
 
-      - name: Montar el sitio
+      - name: Instalar herramientas
+        run: npm install --no-save --no-audit --no-fund sharp@0.35 esbuild@0.28 playwright@1
+
+      - name: Montar el sitio (JS empaquetado y minificado, CSS minificado)
         run: |
           mkdir -p _site/data
-          cp -r web/* _site/
+          cp -r web/*.html web/*.svg web/*.png web/fonts _site/
+          npx esbuild web/js/inicio.js web/js/lista.js web/js/ficha.js web/js/common.js \
+            --bundle --format=esm --minify --target=es2022 --outdir=_site/js
+          npx esbuild web/css/site.css --minify --outfile=_site/css/site.css
           touch _site/.nojekyll
 
       - name: Generar datos del listado desde PokeAPI
         run: node tools/build-data.mjs _site/data/pokedex.json
 
+      - name: Recuperar miniaturas ya generadas
+        uses: actions/cache@v4
+        with:
+          path: .thumbs
+          key: thumbs-v1-${{ hashFiles('tools/build-thumbs.mjs') }}-${{ github.run_id }}
+          restore-keys: thumbs-v1-${{ hashFiles('tools/build-thumbs.mjs') }}-
+
+      - name: Generar miniaturas WebP
+        run: |
+          node tools/build-thumbs.mjs _site/data/pokedex.json .thumbs
+          cp -r .thumbs _site/img
+          du -sh _site/img/p _site/img/hero
+
       - name: Probar en Chromium contra PokeAPI
         run: |
-          npm install --no-save --no-audit --no-fund playwright@1
           npx playwright install --with-deps chromium
-          node tools/test-web.mjs _site
+          SCREENS_DIR=screens node tools/test-web.mjs _site
+
+      - name: Guardar capturas en la rama "capturas"
+        if: always() && hashFiles('screens/*.png') != ''
+        run: |
+          cd screens
+          git init -q
+          git checkout -q -b capturas
+          git add .
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "Capturas de ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" capturas
 
       - uses: actions/upload-pages-artifact@v3
         with:

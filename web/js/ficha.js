@@ -1,6 +1,6 @@
 /* Pokédex estática — ficha de un Pokémon (pokemon.html?id=25 o ?n=pikachu). */
 import {
-    ARTWORK, NotFoundError, api, cleanText, esc, generation, isTyping, loadPokedex,
+    ARTWORK, NotFoundError, THUMB, api, cleanText, esc, generation, isTyping, loadPokedex,
     normalize, pad, pickLanguage, prettyName, tryApi, typeBadge
 } from "./common.js";
 
@@ -112,20 +112,23 @@ function typeChart(defending, data) {
 }
 
 async function loadDetail(id, data) {
-    const [pokemon, species] = await Promise.all([api("pokemon/" + id), api("pokemon-species/" + id)]);
-
-    const abilitySlots = (pokemon.abilities || []).slice().sort((a, b) => a.slot - b.slot);
-    const [abilities, stages] = await Promise.all([
-        Promise.all(abilitySlots.map(async (slot) => {
+    // Cada dato secundario se pide en cuanto llega lo que necesita, sin esperar al resto:
+    // la cadena evolutiva sale de la especie y las habilidades del Pokémon.
+    const pokemonP = api("pokemon/" + id);
+    const speciesP = api("pokemon-species/" + id);
+    const stagesP = speciesP.then((species) => evolutionStages(species, id, data));
+    const abilitiesP = pokemonP.then((pokemon) => {
+        const slots = (pokemon.abilities || []).slice().sort((a, b) => a.slot - b.slot);
+        return Promise.all(slots.map(async (slot) => {
             const detail = await tryApi(slot.ability.url);
             return {
                 name: (detail && pickLanguage(detail.names, "name")) || prettyName(slot.ability.name),
                 description: detail ? cleanText(pickLanguage(detail.flavor_text_entries, "flavor_text", true)) : null,
                 hidden: slot.is_hidden
             };
-        })),
-        evolutionStages(species, id, data)
-    ]);
+        }));
+    });
+    const [pokemon, species, abilities, stages] = await Promise.all([pokemonP, speciesP, abilitiesP, stagesP]);
 
     const typeKeys = (pokemon.types || []).slice().sort((a, b) => a.slot - b.slot).map((t) => t.type.name);
     const other = (pokemon.sprites && pokemon.sprites.other) || {};
@@ -261,7 +264,7 @@ function render(p) {
         <li class="evo__member${m.current ? " is-current" : ""}">
             <span class="evo__condition">${esc(m.condition)}</span>
             <a href="${href(m.id)}"${m.current ? ` aria-current="page"` : ""}>
-                <img src="${ARTWORK(m.id)}" alt="" width="120" height="120" loading="lazy" decoding="async" />
+                <img src="${THUMB(m.id)}" data-fallback="${ARTWORK(m.id)}" alt="" width="120" height="120" loading="lazy" decoding="async" />
                 <span class="evo__name">${esc(m.name)}</span>
                 <span class="evo__num">${pad(m.id)}</span>
             </a>
