@@ -178,7 +178,7 @@ try {
             const shot = await ctx.newPage();
             for (const [name, path] of shots) {
                 await shot.goto(origin + path);
-                await shot.waitForSelector(".typegrid a, .dex-card, .entry__name", { timeout: 30000 });
+                await shot.waitForSelector(".typegrid a, .dex-card:not([hidden]), .entry__name", { timeout: 30000 });
                 await shot.waitForLoadState("networkidle").catch(() => {});
                 await shot.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
                 await shot.waitForTimeout(800);
