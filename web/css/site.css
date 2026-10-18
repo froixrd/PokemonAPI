@@ -2104,6 +2104,335 @@ kbd {
     }
 }
 
+/* ---------- Página de regiones ---------- */
+
+.region-nav {
+    margin-bottom: 24px;
+}
+
+.region-nav .genchip {
+    text-decoration: none;
+}
+
+.region-list {
+    display: grid;
+    gap: 16px;
+}
+
+.region {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 32px;
+    padding: clamp(20px, 3vw, 32px);
+    border-radius: var(--radius-l);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    scroll-margin-top: calc(var(--topbar) + 16px);
+}
+
+.region__gen {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.region__name {
+    margin-top: 2px;
+    font-size: var(--step-4);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+}
+
+.region__blurb {
+    margin-top: 10px;
+    max-width: 44ch;
+    color: var(--muted);
+}
+
+.region__facts {
+    display: flex;
+    gap: 32px;
+    margin: 20px 0 0;
+}
+
+.region__facts dt {
+    font-size: var(--step--1);
+    color: var(--muted);
+}
+
+.region__facts dd {
+    margin: 2px 0 0;
+    font-weight: 600;
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.region__types-label {
+    margin-top: 18px;
+    font-size: var(--step--1);
+    color: var(--muted);
+}
+
+.region__types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.region__types .type {
+    text-decoration: none;
+}
+
+.region__types .type:hover {
+    background: color-mix(in srgb, var(--tc) 26%, var(--surface));
+}
+
+.region__types .muted {
+    font-weight: 400;
+    margin-left: 2px;
+}
+
+.region__cta {
+    margin-top: 24px;
+}
+
+.region__mons h3 {
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0;
+}
+
+.region__mons h3 + .mons {
+    margin-bottom: 18px;
+}
+
+.mons {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mons--starters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mons--legend {
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+}
+
+.mons a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 6px 10px;
+    border-radius: var(--radius-m);
+    text-decoration: none;
+    text-align: center;
+    background: color-mix(in srgb, var(--tc) 8%, var(--surface-2));
+    transition: background-color 140ms ease;
+}
+
+.mons a:hover {
+    background: color-mix(in srgb, var(--tc) 18%, var(--surface-2));
+}
+
+.mon__art {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.mons--starters .mon__art {
+    max-width: 128px;
+}
+
+.mons--legend .mon__art {
+    max-width: 80px;
+}
+
+.mon__art img {
+    width: 88%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mons a:hover .mon__art img {
+    transform: translateY(-3px);
+}
+
+.mon__name {
+    margin-top: 2px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.mons--legend .mon__name {
+    font-size: 0.8125rem;
+}
+
+@media (max-width: 860px) {
+    .region {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+}
+
+/* ---------- Página de tipos ---------- */
+
+.tgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 14px;
+}
+
+.tcard {
+    padding: 18px 20px 20px;
+    border-radius: var(--radius-l);
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--tc) 12%, var(--surface)) 0, var(--surface) 90px);
+    border: 1px solid color-mix(in srgb, var(--tc) 22%, var(--line));
+    scroll-margin-top: calc(var(--topbar) + 16px);
+}
+
+.tcard:target {
+    border-color: var(--tc);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tc) 30%, transparent);
+}
+
+.tcard__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tcard__icon {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--ico) center / 60% no-repeat, var(--tc);
+}
+
+.tcard__name {
+    font-size: var(--step-2);
+    font-weight: 700;
+}
+
+.tcard__count {
+    font-size: var(--step--1);
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.tcard__count:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.tcard__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.tcard h3 {
+    margin-bottom: 8px;
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0;
+}
+
+.tcard dl {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+}
+
+.tcard__row dt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.tcard__row dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 5px 0 0;
+    font-size: 0.8125rem;
+}
+
+.tcard__mult {
+    min-width: 28px;
+    padding: 0 6px;
+    border-radius: 999px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.tcard__mult--x2 { background: color-mix(in srgb, #e5533d 18%, var(--surface)); color: #c43a26; }
+.tcard__mult--x05 { background: color-mix(in srgb, #2f9e6e 18%, var(--surface)); color: #237a54; }
+.tcard__mult--x0 { background: var(--ink); color: var(--bg); }
+
+:root[data-theme="dark"] .tcard__mult--x2 { color: #ff8a73; }
+:root[data-theme="dark"] .tcard__mult--x05 { color: #5fd3a0; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .tcard__mult--x2 { color: #ff8a73; }
+    :root:not([data-theme="light"]) .tcard__mult--x05 { color: #5fd3a0; }
+}
+
+/* Chip de tipo compacto: icono y nombre, enlaza a la tarjeta de ese tipo. */
+.tcard__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px 2px 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--tc) 14%, var(--surface));
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.tcard__chip::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--ico) center / 62% no-repeat, var(--tc);
+}
+
+.tcard__chip:hover {
+    background: color-mix(in srgb, var(--tc) 26%, var(--surface));
+}
+
+@media (max-width: 420px) {
+    .tgrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tcard__cols {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* ---------- Páginas de texto, avisos y carga ---------- */
 
 .prose {

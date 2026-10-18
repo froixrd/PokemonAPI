@@ -34,6 +34,8 @@ Todo pasa por `Services/PokeApiClient.cs`:
 
 - `web/index.html`: portada con un Pokémon destacado distinto cada día, buscador y accesos por tipo y región.
 - `web/pokedex.html`: listado con filtros. `web/pokemon.html?id=25` (o `?n=pikachu`): ficha.
+- `web/regiones.html`: las nueve regiones con sus especies, tipos más frecuentes, iniciales y legendarios.
+- `web/tipos.html`: los 18 tipos con su número de especies y su tabla de eficacias al atacar y al defender.
 - Desde cualquier página: búsqueda rápida (botón de la barra o tecla `/`) y Pokémon aleatorio.
 - Al publicar, `tools/build-data.mjs` genera `data/pokedex.json` con todas las especies, su nombre en español, tipos y generación, y la tabla de daño de los 18 tipos. Así el listado carga de una vez, sin 1000 llamadas desde el navegador.
 - Cada ficha pide a PokeAPI desde el navegador el Pokémon, la especie, las habilidades y la cadena evolutiva.

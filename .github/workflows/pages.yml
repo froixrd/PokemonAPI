@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p _site/data
           cp -r web/*.html web/*.svg web/*.png web/fonts _site/
-          npx esbuild web/js/inicio.js web/js/lista.js web/js/ficha.js web/js/common.js \
+          npx esbuild web/js/inicio.js web/js/lista.js web/js/ficha.js web/js/tipos.js web/js/regiones.js web/js/common.js \
             --bundle --format=esm --minify --target=es2022 --outdir=_site/js
           npx esbuild web/css/site.css --minify --outfile=_site/css/site.css
           touch _site/.nojekyll

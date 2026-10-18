@@ -54,6 +54,24 @@ try {
     const featuredName = await page.locator("#featured-caption strong").innerText();
     check(featuredName.length > 0, "Portada: Pokémon destacado " + featuredName);
 
+    // Menú: Regiones y Tipos llevan a sus páginas
+    await page.goto(origin + "pokedex.html");
+    await page.click(".menu a[href='regiones.html']");
+    await page.waitForSelector(".region", { timeout: 30000 });
+    check(await page.locator(".region").count() === 9, "Menú > Regiones: 9 regiones");
+    check(await page.locator(".region").first().locator(".mons--starters a").count() === 3, "Kanto con sus 3 iniciales");
+    check(await page.locator("#sinnoh .mons--legend a").count() === 3, "Sinnoh con sus 3 legendarios");
+    await page.click(".menu a[href='tipos.html']");
+    await page.waitForSelector(".tcard", { timeout: 30000 });
+    check(await page.locator(".tcard").count() === 18, "Menú > Tipos: 18 tipos");
+    const fireStrong = await page.locator("#fire .tcard__row").first().locator(".tcard__chip").allInnerTexts();
+    check(fireStrong.includes("Planta") && fireStrong.includes("Acero"), "Fuego muy eficaz contra: " + fireStrong.join(", "));
+    await page.goto(origin + "regiones.html#paldea");
+    await page.waitForSelector("#paldea .mons a", { timeout: 30000 });
+    await page.waitForTimeout(400);
+    const paldeaTop = await page.evaluate(() => Math.round(document.getElementById("paldea").getBoundingClientRect().top));
+    check(paldeaTop >= 0 && paldeaTop < 200, `Enlace directo a #paldea (a ${paldeaTop} px del borde)`);
+
     // Búsqueda rápida desde el menú
     await page.click("[data-search-open]");
     await page.keyboard.type("pikachu");
@@ -172,13 +190,13 @@ try {
     // Capturas para revisar el diseño con datos reales
     if (SCREENS) {
         await mkdir(SCREENS, { recursive: true });
-        const shots = [["inicio", ""], ["pokedex", "pokedex.html"], ["pokedex-filtro", "pokedex.html?tipo=dragon&gen=4"], ["ficha", "pokemon.html?id=6"], ["ficha-eevee", "pokemon.html?id=133"]];
+        const shots = [["inicio", ""], ["pokedex", "pokedex.html"], ["pokedex-filtro", "pokedex.html?tipo=dragon&gen=4"], ["ficha", "pokemon.html?id=6"], ["ficha-eevee", "pokemon.html?id=133"], ["regiones", "regiones.html"], ["tipos", "tipos.html"]];
         for (const [w, h, label, scheme] of [[1280, 900, "escritorio", "light"], [390, 844, "movil", "dark"]]) {
             const ctx = await browser.newContext({ viewport: { width: w, height: h }, colorScheme: scheme, deviceScaleFactor: 1 });
             const shot = await ctx.newPage();
             for (const [name, path] of shots) {
                 await shot.goto(origin + path);
-                await shot.waitForSelector(".typegrid a, .dex-card:not([hidden]), .entry__name", { timeout: 30000 });
+                await shot.waitForSelector(".typegrid a, .dex-card:not([hidden]), .entry__name, .region, .tcard", { timeout: 30000 });
                 await shot.waitForLoadState("networkidle").catch(() => {});
                 await shot.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
                 await shot.waitForTimeout(800);

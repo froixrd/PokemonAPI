@@ -1,12 +1,7 @@
 /* Pokédex estática — portada: banner con un Pokémon destacado, tipos y regiones. */
 import { ARTWORK, GENERATIONS, HERO, THUMB, esc, loadPokedex, pad, typeBadge } from "./common.js";
 import { featuredToday } from "./featured.js";
-
-// Las tres iniciales de cada región.
-const STARTERS = {
-    1: [1, 4, 7], 2: [152, 155, 158], 3: [252, 255, 258], 4: [387, 390, 393], 5: [495, 498, 501],
-    6: [650, 653, 656], 7: [722, 725, 728], 8: [810, 813, 816], 9: [906, 909, 912]
-};
+import { STARTERS } from "./regions-data.js";
 
 const hero = document.getElementById("hero");
 const featured = document.getElementById("featured");
@@ -80,3 +75,9 @@ document.getElementById("regions").innerHTML = GENERATIONS.map((g) => {
         `<span class="tc-${esc(s.types[0] || "normal")}"><img src="${THUMB(s.id)}" data-fallback="${ARTWORK(s.id)}" alt="" width="96" height="96" loading="lazy" decoding="async" /></span>`).join("")}</span>
 </a></li>`;
 }).join("");
+
+// Enlaces antiguos a #tipos o #regiones: ir a la sección ahora que ya tiene contenido.
+if (location.hash) {
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (target) target.scrollIntoView();
+}
