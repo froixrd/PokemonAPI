@@ -1,20 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff7a45"/>
-      <stop offset="1" stop-color="#e3263f"/>
+    <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2393f"/>
+      <stop offset="1" stop-color="#c8162a"/>
     </linearGradient>
-    <radialGradient id="lens" cx=".38" cy=".36" r=".75">
-      <stop offset="0" stop-color="#4cc3ff"/>
-      <stop offset=".55" stop-color="#1678c9"/>
-      <stop offset="1" stop-color="#0c2f57"/>
+    <radialGradient id="lens" cx=".36" cy=".34" r=".8">
+      <stop offset="0" stop-color="#7fd6ff"/>
+      <stop offset=".5" stop-color="#1f8be0"/>
+      <stop offset="1" stop-color="#0b3b78"/>
     </radialGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b8f2c9"/>
+      <stop offset="1" stop-color="#5fc98a"/>
+    </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="18" fill="url(#bg)"/>
-  <path d="M10 46.5c7.5 6.2 26.5 8.8 44-3" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="27" cy="29" r="16" fill="#fff"/>
-  <circle cx="27" cy="29" r="11" fill="url(#lens)"/>
-  <circle cx="22.8" cy="24.6" r="3.4" fill="#fff" fill-opacity=".9"/>
-  <circle cx="50" cy="14" r="4" fill="#fff"/>
-  <circle cx="50" cy="26" r="4" fill="#fff" fill-opacity=".55"/>
+  <!-- carcasa con la bisagra a la izquierda -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#shell)"/>
+  <path d="M2 18a16 16 0 0 1 16-16h-2v60h2A16 16 0 0 1 2 46z" fill="#8f0f1f" opacity=".55"/>
+  <rect x="15" y="2" width="3" height="60" fill="#8f0f1f" opacity=".35"/>
+  <!-- lente grande -->
+  <circle cx="31" cy="20" r="11.5" fill="#fff"/>
+  <circle cx="31" cy="20" r="8.5" fill="url(#lens)"/>
+  <circle cx="28" cy="16.8" r="2.6" fill="#fff" fill-opacity=".9"/>
+  <!-- pilotos -->
+  <circle cx="47" cy="12" r="2.8" fill="#ff5b5b" stroke="#8f0f1f" stroke-width="1"/>
+  <circle cx="54.5" cy="12" r="2.8" fill="#ffd23f" stroke="#8f0f1f" stroke-width="1"/>
+  <circle cx="47" cy="20" r="2.8" fill="#4cd964" stroke="#8f0f1f" stroke-width="1"/>
+  <!-- pantalla -->
+  <rect x="22" y="36" width="34" height="20" rx="4" fill="#1b2430"/>
+  <rect x="25" y="39" width="28" height="14" rx="2.5" fill="url(#screen)"/>
+  <path d="M27.5 47.5l4-4 3.5 3 4.5-5 4 4.5 4-3" fill="none" stroke="#1b5e3a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
