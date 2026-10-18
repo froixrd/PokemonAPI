@@ -260,7 +260,7 @@ function render(p) {
     const evolution = `
 <section class="panel panel--wide" aria-labelledby="h-evolution">
     <h2 id="h-evolution">Evolución</h2>
-    ${p.stages.length <= 1 ? `<p class="muted">${esc(p.name)} no evoluciona.</p>` : `<ol class="evo">${p.stages.map((stage) => `<li class="evo__stage"><ul class="evo__members">${stage.map((m) => `
+    ${p.stages.length <= 1 ? `<p class="muted">${esc(p.name)} no evoluciona.</p>` : `<ol class="evo">${p.stages.map((stage) => `<li class="evo__stage${stage.length > 3 ? " evo__stage--many" : ""}"><ul class="evo__members">${stage.map((m) => `
         <li class="evo__member${m.current ? " is-current" : ""}">
             <span class="evo__condition">${esc(m.condition)}</span>
             <a href="${href(m.id)}"${m.current ? ` aria-current="page"` : ""}>
